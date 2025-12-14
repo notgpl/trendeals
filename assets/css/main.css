@@ -1020,6 +1020,7 @@ contact-item h4 {
 
 
 /*--------------------------------------------------------------
+<<<<<<< HEAD
 # Products Section
 --------------------------------------------------------------*/
 
@@ -1372,3 +1373,161 @@ contact-item h4 {
     font-size: 13px;
   }
 }
+=======
+# Categories Section
+--------------------------------------------------------------*/
+.categories .categories-filters {
+  padding: 0;
+  margin: 0 auto 20px auto;
+  list-style: none;
+  text-align: center;
+}
+
+.categories .categories-filters li {
+  cursor: pointer;
+  display: inline-block;
+  padding: 0;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 10px;
+  line-height: 1;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  transition: all 0.3s ease-in-out;
+}
+
+.categories .categories-filters li:hover,
+.categories .categories-filters li.filter-active {
+  color: var(--accent-color);
+}
+
+.categories .categories-filters li:first-child {
+  margin-left: 0;
+}
+
+.categories .categories-filters li:last-child {
+  margin-right: 0;
+}
+
+@media (max-width: 575px) {
+  .categories .categories-filters li {
+    font-size: 14px;
+    margin: 0 5px;
+  }
+}
+
+.categories .categories-item {
+  position: relative;
+}
+
+.categories .categories-item .categories-info {
+  background-color: color-mix(in srgb, var(--surface-color), transparent 10%);
+  opacity: 0;
+  position: absolute;
+  left: 30px;
+  right: 30px;
+  bottom: 0;
+  z-index: 3;
+  transition: all ease-in-out 0.3s;
+  padding: 15px;
+}
+
+.categories .categories-item .categories-info h4 {
+  font-size: 18px;
+  font-weight: 600;
+  padding-right: 50px;
+}
+
+.categories .categories-item .categories-info p {
+  color: color-mix(in srgb, var(--default-color), transparent 30%);
+  font-size: 14px;
+  margin-bottom: 0;
+  padding-right: 50px;
+}
+
+.categories .categories-item:hover .categories-info {
+  opacity: 1;
+  bottom: 20px;
+}
+
+.categories .categories-item img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+@media (max-width: 992px) {
+  .categories .categories-item img {
+    height: 400px;
+  }
+}
+
+@media (max-width: 576px) {
+  .categories .categories-item img {
+    height: 400px;
+  }
+}
+
+/* Price tag styling */
+.categories .categories-item .price-tag {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background: var(--accent-color);
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 22px;
+  font-weight: 700;
+  border-radius: 6px;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 576px) {
+  .categories .categories-item .price-tag {
+    font-size: 18px;
+    padding: 5px 10px;
+  }
+}
+
+/* Availability Box */
+.categories .categories-item .availability-box {
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.808);
+  color: #098805;
+  padding: 6px 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  z-index: 10;
+  backdrop-filter: blur(3px);
+}
+
+.categories .categories-item .availability-box .color-circle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 0px solid #fff;
+}
+
+@media (max-width: 576px) {
+  .categories .categories-item .availability-box {
+    font-size: 14px;
+    padding: 4px 8px;
+    gap: 4px;
+  }
+  
+  .categories .categories-item .availability-box .color-circle {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+
+>>>>>>> e4805cdc6c8aef89ec7327dcef00fb64ebd87f68
