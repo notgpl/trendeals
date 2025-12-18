@@ -2,20 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= HOME → PRODUCT PAGE ================= */
   window.openProduct = function (id) {
-    const name = card.dataset.name;
-    const price = card.dataset.price;
-    const images = card.dataset.images || "";
-    const sizes = card.dataset.sizes || "";
-    const colors = card.dataset.colors || "";
-
-    const url =
-      "product.html" +
-      "?name=" + encodeURIComponent(name) +
-      "&price=" + price +
-      "&images=" + encodeURIComponent(images) +
-      "&sizes=" + encodeURIComponent(sizes) +
-      "&colors=" + encodeURIComponent(colors);
-
     window.location.href = `product.html?id=${id}`;
   };
 
