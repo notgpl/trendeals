@@ -1,39 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Trendeals Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    body { font-family: Arial; padding: 15px; }
-    input, button { width: 100%; margin: 6px 0; padding: 10px; }
-    .product { border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
-  </style>
-</head>
-<body>
-
-<h2>Admin Login</h2>
-
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-
-<button onclick="login()">Login</button>
-
-<div id="panel" style="display:none;">
-  <h3>Add Product</h3>
-
-  <input id="name" placeholder="Name">
-  <input id="price" placeholder="Price">
-  <input id="category" placeholder="Category">
-  <input id="images" placeholder="Images (comma separated)">
-
-  <button onclick="addProduct()">Add Product</button>
-
-  <h3>Products</h3>
-  <div id="products"></div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = "https://ctiglwnyimjzocvuizdq.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0aWdsd255aW1qem9jdnVpemRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDI4MTMsImV4cCI6MjA4MTYxODgxM30.eW5nl5yCXnz0V0iya6cZCMj4Pgy05vhClUQ4pLfwYNI";
@@ -43,10 +8,23 @@
     SUPABASE_KEY
   );
 
+  const loginBox = document.querySelector("h2");
+  const panel = document.getElementById("panel");
+
+  // 🔁 Restore session on refresh
+  document.addEventListener("DOMContentLoaded", async () => {
+    const { data } = await client.auth.getSession();
+
+    if (data.session) {
+      showPanel();
+      loadProducts();
+    }
+  });
+
   async function login() {
     const { error } = await client.auth.signInWithPassword({
-      email: document.getElementById("email").value,
-      password: document.getElementById("password").value
+      email: email.value,
+      password: password.value
     });
 
     if (error) {
@@ -54,12 +32,18 @@
       return;
     }
 
+    showPanel();
     loadProducts();
   }
 
-  async function loadProducts() {
-    document.getElementById("panel").style.display = "block";
+  function showPanel() {
+    loginBox.style.display = "none";
+    document.getElementById("email").style.display = "none";
+    document.getElementById("password").style.display = "none";
+    panel.style.display = "block";
+  }
 
+  async function loadProducts() {
     const { data, error } = await client
       .from("products")
       .select("*")
@@ -77,14 +61,10 @@
       box.innerHTML += `
         <div class="product">
           <b>${p.name}</b> – ₹${p.price}<br>
-
           <button onclick="toggleAvailability('${p.id}', ${!p.available})">
             ${p.available ? "Disable" : "Enable"}
           </button>
-
-          <button onclick="removeProduct('${p.id}')">
-            Delete
-          </button>
+          <button onclick="removeProduct('${p.id}')">Delete</button>
         </div>
       `;
     });
@@ -93,7 +73,7 @@
   async function addProduct() {
     await client.from("products").insert({
       name: name.value,
-      price: price.value,
+      price: Number(price.value),
       category: category.value,
       images: images.value.split(","),
       available: true
@@ -112,7 +92,3 @@
     loadProducts();
   }
 </script>
-
-</body>
-</html>
-
