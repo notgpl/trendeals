@@ -138,53 +138,50 @@
 
   // ➕ ADD PRODUCT
   async function addProduct() {
-    const imgs = images.value.split(",").map(i => i.trim());
+  const nameInput = document.getElementById("name");
+  const priceInput = document.getElementById("price");
+  const categoryInput = document.getElementById("category");
+  const imagesInput = document.getElementById("images");
 
-    if (!name.value || !price.value || !category.value || !imgs[0]) {
-      alert("Fill all fields correctly");
-      return;
-    }
+  const imgs = imagesInput.value.split(",").map(i => i.trim());
 
-    const { error } = await client.from("products").insert({
-      name: name.value.trim(),
-      price: Number(price.value),
-      category: category.value.trim(),
-      images: imgs,
-      sizes: [],
-      colors: [],
-      available: true
-    });
-
-    if (error) {
-      alert(error.message);
-      console.error(error);
-      return;
-    }
-
-    name.value = price.value = category.value = images.value = "";
-    loadProducts();
+  if (
+    !nameInput.value.trim() ||
+    !priceInput.value.trim() ||
+    !categoryInput.value.trim() ||
+    imgs.length === 0 ||
+    !imgs[0]
+  ) {
+    alert("Fill all fields correctly");
+    return;
   }
 
-  // 👁️ TOGGLE AVAILABILITY
-  async function toggleAvailability(id, state) {
-    await client.from("products")
-      .update({ available: state })
-      .eq("id", id);
+  const { error } = await client.from("products").insert({
+    name: nameInput.value.trim(),
+    price: Number(priceInput.value),
+    category: categoryInput.value.trim(),
+    images: imgs,
+    sizes: [],
+    colors: [],
+    available: true
+  });
 
-    loadProducts();
+  if (error) {
+    alert(error.message);
+    console.error(error);
+    return;
   }
 
-  // ❌ DELETE PRODUCT
-  async function removeProduct(id) {
-    if (!confirm("Delete this product?")) return;
+  nameInput.value = "";
+  priceInput.value = "";
+  categoryInput.value = "";
+  imagesInput.value = "";
 
-    await client.from("products")
-      .delete()
-      .eq("id", id);
+  loadProducts();
+}
 
-    loadProducts();
-  }
 </script>
 
 </body>
 </html>
+
