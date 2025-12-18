@@ -1,58 +1,73 @@
-document.addEventListener("DOMContentLoaded", () => {
-  fetch("/data/products.json")
-    .then(res => res.json())
-    .then(data => {
-      const section = document.getElementById("products");
-      if (!section) return;
+const SUPABASE_URL = "https://ctiglwnyimjzocvuizdq.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0aWdsd255aW1qem9jdnVpemRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDI4MTMsImV4cCI6MjA4MTYxODgxM30.eW5nl5yCXnz0V0iya6cZCMj4Pgy05vhClUQ4pLfwYNI";
 
-      data.categories.forEach(cat => {
-        const wrapper = document.createElement("div");
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
-        wrapper.innerHTML = `
-          <h2 style="margin-top:20px;">${cat.title}</h2>
+document.addEventListener("DOMContentLoaded", async () => {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("available", true)
+    .order("created_at", { ascending: false });
 
-          <div class="swiper productSwiper">
-            <div class="swiper-wrapper">
-              ${cat.products.map(p => `
-                <div class="swiper-slide product-card"
-                  onclick="openProduct(this)"
-                  data-name="${p.name}"
-                  data-price="${p.price}"
-                  data-images="${p.images.join(",")}"
-                  data-sizes="${(p.sizes || []).join(",")}"
-                  data-colors="${(p.colors || []).join(",")}">
+  if (error) {
+    console.error("Supabase error:", error);
+    return;
+  }
 
-                  <div class="price-tag">₹${p.price}</div>
+  const section = document.getElementById("products");
+  section.innerHTML = "";
 
-                  <div class="product-image">
-                    <img src="${p.images[0]}" alt="">
+  // Group by category
+  const grouped = {};
+  data.forEach(p => {
+    grouped[p.category] = grouped[p.category] || [];
+    grouped[p.category].push(p);
+  });
 
-                    <div class="availability-box">
-                      <span class="status">
-                        ${p.available ? "Available" : "Out of Stock"}
-                      </span>
-                    </div>
-                  </div>
+  Object.keys(grouped).forEach(category => {
+    const html = `
+      <h2 style="margin-top:20px;">${category}</h2>
+      <div class="swiper productSwiper">
+        <div class="swiper-wrapper">
+          ${grouped[category].map(p => `
+            <div class="swiper-slide product-card"
+              onclick="openProduct(this)"
+              data-name="${p.name}"
+              data-price="${p.price}"
+              data-images="${p.images.join(",")}"
+              data-sizes="${(p.sizes || []).join(",")}"
+              data-colors="${(p.colors || []).join(",")}">
 
-                  <h4>${p.name}</h4>
+              <div class="price-tag">₹${p.price}</div>
+
+              <div class="product-image">
+                <img src="${p.images[0]}" alt="">
+                <div class="availability-box">
+                  <span class="status">Available</span>
                 </div>
-              `).join("")}
+              </div>
+
+              <h4>${p.name}</h4>
             </div>
-          </div>
-        `;
+          `).join("")}
+        </div>
+      </div>
+    `;
 
-        section.appendChild(wrapper);
-      });
+    section.insertAdjacentHTML("beforeend", html);
+  });
 
-      // Init Swiper AFTER DOM is ready
-      new Swiper(".productSwiper", {
-        slidesPerView: 1.3,
-        spaceBetween: 15,
-        breakpoints: {
-          768: { slidesPerView: 3 },
-          1024: { slidesPerView: 4 }
-        }
-      });
-    })
-    .catch(err => console.error("Product load error:", err));
+  // Re-init Swiper
+  new Swiper(".productSwiper", {
+    slidesPerView: 1.3,
+    spaceBetween: 15,
+    breakpoints: {
+      768: { slidesPerView: 3 },
+      1024: { slidesPerView: 4 }
+    }
+  });
 });
