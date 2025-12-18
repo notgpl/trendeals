@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Trendeals Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial; padding: 15px; }
+    input, button { width: 100%; margin: 6px 0; padding: 10px; }
+    .product { border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<h2>Admin Login</h2>
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+
+<div id="panel" style="display:none;">
+  <h3>Add Product</h3>
+  <input id="name" placeholder="Name">
+  <input id="price" placeholder="Price">
+  <input id="category" placeholder="Category">
+  <input id="images" placeholder="Images (comma separated)">
+  <button onclick="addProduct()">Add Product</button>
+
+  <h3>Products</h3>
+  <div id="products"></div>
+</div>
+
+<script>
+const supabase = window.supabase.createClient(
+  "YOUR_SUPABASE_URL",
+  "YOUR_ANON_KEY"
+);
+
+async function login() {
+  const { error } = await supabase.auth.signInWithPassword({
+    email: email.value,
+    password: password.value
+  });
+  if (error) alert(error.message);
+  else loadProducts();
+}
+
+async function loadProducts() {
+  document.getElementById("panel").style.display = "block";
+  const { data } = await supabase.from("products").select("*");
+  const box = document.getElementById("products");
+  box.innerHTML = "";
+
+  data.forEach(p => {
+    box.innerHTML += `
+      <div class="product">
+        <b>${p.name}</b> - ₹${p.price}
+        <br>
+        <button onclick="toggle('${p.id}', ${!p.available})">
+          ${p.available ? "Disable" : "Enable"}
+        </button>
+        <button onclick="remove('${p.id}')">Delete</button>
+      </div>
+    `;
+  });
+}
+
+async function addProduct() {
+  await supabase.from("products").insert({
+    name: name.value,
+    price: price.value,
+    category: category.value,
+    images: images.value.split(","),
+    available: true
+  });
+  loadProducts();
+}
+
+async function toggle(id, state) {
+  await supabase.from("products").update({ available: state }).eq("id", id);
+  loadProducts();
+}
+
+async function remove(id) {
+  await supabase.from("products").delete().eq("id", id);
+  loadProducts();
+}
+</script>
+
+</body>
+</html>
