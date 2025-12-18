@@ -1,5 +1,64 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Trendeals Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 15px;
+      max-width: 500px;
+      margin: auto;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+    }
+    .product {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 10px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginBox">
+  <h2>Admin Login</h2>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="panel" class="hidden">
+  <h2>Admin Panel</h2>
+
+  <button onclick="logout()">Logout</button>
+
+  <h3>Add Product</h3>
+  <input id="name" placeholder="Name">
+  <input id="price" placeholder="Price">
+  <input id="category" placeholder="Category">
+  <input id="images" placeholder="Images (comma separated)">
+  <button onclick="addProduct()">Add Product</button>
+
+  <h3>Products</h3>
+  <div id="products"></div>
+</div>
+
 <script>
+  // 🔑 SUPABASE CONFIG
   const SUPABASE_URL = "https://ctiglwnyimjzocvuizdq.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0aWdsd255aW1qem9jdnVpemRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDI4MTMsImV4cCI6MjA4MTYxODgxM30.eW5nl5yCXnz0V0iya6cZCMj4Pgy05vhClUQ4pLfwYNI";
 
@@ -8,19 +67,19 @@
     SUPABASE_KEY
   );
 
-  const loginBox = document.querySelector("h2");
+  const loginBox = document.getElementById("loginBox");
   const panel = document.getElementById("panel");
 
   // 🔁 Restore session on refresh
   document.addEventListener("DOMContentLoaded", async () => {
     const { data } = await client.auth.getSession();
-
     if (data.session) {
       showPanel();
       loadProducts();
     }
   });
 
+  // 🔐 LOGIN
   async function login() {
     const { error } = await client.auth.signInWithPassword({
       email: email.value,
@@ -36,13 +95,18 @@
     loadProducts();
   }
 
-  function showPanel() {
-    loginBox.style.display = "none";
-    document.getElementById("email").style.display = "none";
-    document.getElementById("password").style.display = "none";
-    panel.style.display = "block";
+  // 🔓 LOGOUT
+  async function logout() {
+    await client.auth.signOut();
+    location.reload();
   }
 
+  function showPanel() {
+    loginBox.classList.add("hidden");
+    panel.classList.remove("hidden");
+  }
+
+  // 📦 LOAD PRODUCTS
   async function loadProducts() {
     const { data, error } = await client
       .from("products")
@@ -60,35 +124,67 @@
     data.forEach(p => {
       box.innerHTML += `
         <div class="product">
-          <b>${p.name}</b> – ₹${p.price}<br>
+          <b>${p.name}</b> – ₹${p.price}<br><br>
           <button onclick="toggleAvailability('${p.id}', ${!p.available})">
             ${p.available ? "Disable" : "Enable"}
           </button>
-          <button onclick="removeProduct('${p.id}')">Delete</button>
+          <button onclick="removeProduct('${p.id}')">
+            Delete
+          </button>
         </div>
       `;
     });
   }
 
+  // ➕ ADD PRODUCT
   async function addProduct() {
-    await client.from("products").insert({
-      name: name.value,
+    const imgs = images.value.split(",").map(i => i.trim());
+
+    if (!name.value || !price.value || !category.value || !imgs[0]) {
+      alert("Fill all fields correctly");
+      return;
+    }
+
+    const { error } = await client.from("products").insert({
+      name: name.value.trim(),
       price: Number(price.value),
-      category: category.value,
-      images: images.value.split(","),
+      category: category.value.trim(),
+      images: imgs,
+      sizes: [],
+      colors: [],
       available: true
     });
 
+    if (error) {
+      alert(error.message);
+      console.error(error);
+      return;
+    }
+
+    name.value = price.value = category.value = images.value = "";
     loadProducts();
   }
 
+  // 👁️ TOGGLE AVAILABILITY
   async function toggleAvailability(id, state) {
-    await client.from("products").update({ available: state }).eq("id", id);
+    await client.from("products")
+      .update({ available: state })
+      .eq("id", id);
+
     loadProducts();
   }
 
+  // ❌ DELETE PRODUCT
   async function removeProduct(id) {
-    await client.from("products").delete().eq("id", id);
+    if (!confirm("Delete this product?")) return;
+
+    await client.from("products")
+      .delete()
+      .eq("id", id);
+
     loadProducts();
   }
 </script>
+
+</body>
+</html>
