@@ -180,53 +180,60 @@ async function uploadGalleryImages(files) {
   }
 
   // ➕ ADD PRODUCT
-  async function addProduct() {
-  const nameInput = document.getElementById("name");
-  const priceInput = document.getElementById("price");
-  const categoryInput = document.getElementById("category");
-  const imagesInput = document.getElementById("images");
+ async function addProduct() {
+  const name = document.getElementById("name").value.trim();
+  const price = document.getElementById("price").value.trim();
+  const category = document.getElementById("category").value.trim();
+  const coverInput = document.getElementById("coverImage");
+  const galleryInput = document.getElementById("galleryImages");
 
-  const imgs = imagesInput.value.split(",").map(i => i.trim());
-
-  if (
-    !nameInput.value.trim() ||
-    !priceInput.value.trim() ||
-    !categoryInput.value.trim() ||
-    imgs.length === 0 ||
-    !imgs[0]
-  ) {
+  if (!name || !price || !category || coverInput.files.length === 0) {
     alert("Fill all fields correctly");
     return;
   }
 
-  const { error } = await client.from("products").insert({
-    name: nameInput.value.trim(),
-    price: Number(priceInput.value),
-    category: categoryInput.value.trim(),
-    images: imgs,
-    sizes: [],
-    colors: [],
-    available: true
-  });
+  try {
+    // upload cover
+    const coverUrl = await uploadSingleImage(coverInput.files[0]);
 
-  if (error) {
-    alert(error.message);
-    console.error(error);
-    return;
+    // upload gallery (MULTIPLE)
+    const galleryUrls = galleryInput.files.length
+      ? await uploadGalleryImages(galleryInput.files)
+      : [];
+
+    const { error } = await client.from("products").insert({
+      name,
+      price: Number(price),
+      category,
+      cover_image: coverUrl,
+      images: galleryUrls,
+      sizes: [],
+      colors: [],
+      available: true
+    });
+
+    if (error) throw error;
+
+    // reset form
+    document.getElementById("name").value = "";
+    document.getElementById("price").value = "";
+    document.getElementById("category").value = "";
+    coverInput.value = "";
+    galleryInput.value = "";
+
+    loadProducts();
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
   }
-
-  nameInput.value = "";
-  priceInput.value = "";
-  categoryInput.value = "";
-  imagesInput.value = "";
-
-  loadProducts();
 }
+
 
 </script>
 
 </body>
 </html>
+
 
 
 
