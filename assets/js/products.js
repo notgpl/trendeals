@@ -1,11 +1,18 @@
 const SUPABASE_URL = "https://ctiglwnyimjzocvuizdq.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0aWdsd255aW1qem9jdnVpemRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDI4MTMsImV4cCI6MjA4MTYxODgxM30.eW5nl5yCXnz0V0iya6cZCMj4Pgy05vhClUQ4pLfwYNI";
+const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0aWdsd255aW1qem9jdnVpemRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDI4MTMsImV4cCI6MjA4MTYxODgxM30.eW5nl5yCXnz0V0iya6cZCMj4Pgy05vhClUQ4pLfwYNI";
 
 const client = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
 
+/* ================= OPEN PRODUCT ================= */
+window.openProduct = function (id) {
+  window.location.href = `product.html?id=${id}`;
+};
+
+/* ================= LOAD PRODUCTS ================= */
 document.addEventListener("DOMContentLoaded", async () => {
   const { data, error } = await client
     .from("products")
@@ -22,12 +29,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!section) return;
   section.innerHTML = "";
 
+  /* GROUP BY CATEGORY */
   const grouped = {};
   data.forEach(p => {
     grouped[p.category] = grouped[p.category] || [];
     grouped[p.category].push(p);
   });
 
+  /* RENDER PRODUCTS */
   Object.keys(grouped).forEach(category => {
     const html = `
       <h2 style="margin-top:20px;">${category}</h2>
@@ -35,17 +44,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="swiper-wrapper">
           ${grouped[category].map(p => `
             <div class="swiper-slide product-card"
-              onclick="openProduct(this)"
-              data-name="${p.name}"
-              data-price="${p.price}"
-              data-images="${p.images.join(",")}"
-              data-sizes="${(p.sizes || []).join(",")}"
-              data-colors="${(p.colors || []).join(",")}">
+                 onclick="openProduct('${p.id}')">
 
               <div class="price-tag">₹${p.price}</div>
 
               <div class="product-image">
-                <img src="${p.images[0]}" alt="">
+                <img src="${p.cover_image}" alt="${p.name}">
                 <div class="availability-box">
                   <span class="status">Available</span>
                 </div>
@@ -60,6 +64,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     section.insertAdjacentHTML("beforeend", html);
   });
 
+  /* INIT SWIPER */
   new Swiper(".productSwiper", {
     slidesPerView: 1.3,
     spaceBetween: 15,
