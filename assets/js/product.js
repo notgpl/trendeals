@@ -107,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ================= TOTAL ================= */
 
   const qtyInput = document.getElementById("qty");
+  if (!qtyInput) return;
   const totalEl = document.getElementById("total");
 
   function updateTotal() {
