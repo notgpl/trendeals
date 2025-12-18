@@ -73,6 +73,43 @@
     SUPABASE_KEY
   );
 
+  async function uploadSingleImage(file) {
+  const fileName = `cover-${Date.now()}-${file.name}`;
+
+  const { error } = await client.storage
+    .from("products")
+    .upload(fileName, file);
+
+  if (error) throw error;
+
+  return client.storage
+    .from("products")
+    .getPublicUrl(fileName).data.publicUrl;
+}
+
+async function uploadGalleryImages(files) {
+  const urls = [];
+
+  for (const file of files) {
+    const fileName = `gallery-${Date.now()}-${file.name}`;
+
+    const { error } = await client.storage
+      .from("products")
+      .upload(fileName, file);
+
+    if (error) throw error;
+
+    const { data } = client.storage
+      .from("products")
+      .getPublicUrl(fileName);
+
+    urls.push(data.publicUrl);
+  }
+
+  return urls;
+}
+
+
   const loginBox = document.getElementById("loginBox");
   const panel = document.getElementById("panel");
 
@@ -190,6 +227,7 @@
 
 </body>
 </html>
+
 
 
 
