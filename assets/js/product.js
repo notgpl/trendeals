@@ -1,8 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= HOME → PRODUCT PAGE ================= */
-
-  window.openProduct = function (card) {
+  window.openProduct = function (id) {
     const name = card.dataset.name;
     const price = card.dataset.price;
     const images = card.dataset.images || "";
@@ -17,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "&sizes=" + encodeURIComponent(sizes) +
       "&colors=" + encodeURIComponent(colors);
 
-    window.location.href = url;
+    window.location.href = `product.html?id=${id}`;
   };
 
   /* ================= PRODUCT DATA ================= */
