@@ -228,11 +228,34 @@ async function uploadGalleryImages(files) {
   }
 }
 
+async function toggleAvailability(id, state) {
+  const { error } = await client
+    .from("products")
+    .update({ available: state })
+    .eq("id", id);
 
+  if (error) alert(error.message);
+  loadProducts();
+}
+
+async function removeProduct(id) {
+  if (!confirm("Delete this product?")) return;
+
+  const { error } = await client
+    .from("products")
+    .delete()
+    .eq("id", id);
+
+  if (error) alert(error.message);
+  loadProducts();
+}
+
+  
 </script>
 
 </body>
 </html>
+
 
 
 
