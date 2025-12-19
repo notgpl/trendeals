@@ -181,11 +181,15 @@ async function uploadGalleryImages(files) {
     });
   }
 
-  // ➕ ADD PRODUCT
- async function addProduct() {
+ // ➕ ADD PRODUCT
+async function addProduct() {
   const name = document.getElementById("name").value.trim();
   const price = document.getElementById("price").value.trim();
   const category = document.getElementById("category").value.trim();
+
+  const sizesInput = document.getElementById("sizes");
+  const colorsInput = document.getElementById("colors");
+
   const coverInput = document.getElementById("coverImage");
   const galleryInput = document.getElementById("galleryImages");
 
@@ -194,32 +198,46 @@ async function uploadGalleryImages(files) {
     return;
   }
 
+  // ✅ READ SIZES & COLORS
+  const sizes = sizesInput.value
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  const colors = colorsInput.value
+    .split(",")
+    .map(c => c.trim())
+    .filter(Boolean);
+
   try {
-    // upload cover
+    // 📤 Upload cover image
     const coverUrl = await uploadSingleImage(coverInput.files[0]);
 
-    // upload gallery (MULTIPLE)
+    // 📤 Upload gallery images (multiple)
     const galleryUrls = galleryInput.files.length
       ? await uploadGalleryImages(galleryInput.files)
       : [];
 
+    // 🧾 INSERT INTO DATABASE
     const { error } = await client.from("products").insert({
       name,
       price: Number(price),
       category,
       cover_image: coverUrl,
       images: galleryUrls,
-      sizes: [],
-      colors: [],
+      sizes,
+      colors,
       available: true
     });
 
     if (error) throw error;
 
-    // reset form
+    // 🔄 RESET FORM
     document.getElementById("name").value = "";
     document.getElementById("price").value = "";
     document.getElementById("category").value = "";
+    sizesInput.value = "";
+    colorsInput.value = "";
     coverInput.value = "";
     galleryInput.value = "";
 
@@ -229,6 +247,7 @@ async function uploadGalleryImages(files) {
     alert(err.message);
   }
 }
+
 
 async function toggleAvailability(id, state) {
   const { error } = await client
@@ -257,6 +276,7 @@ async function removeProduct(id) {
 
 </body>
 </html>
+
 
 
 
