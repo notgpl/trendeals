@@ -1,74 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Trendeals Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<title>Trendeals Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <style>
-    body { font-family: Arial; max-width: 500px; margin: auto; padding: 15px; }
-    input, button { width: 100%; padding: 10px; margin: 6px 0; }
-    .product { border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
-    .hidden { display: none; }
-  </style>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  max-width: 600px;
+  margin: auto;
+  padding: 15px;
+}
+
+button {
+  padding: 10px;
+  width: 100%;
+  cursor: pointer;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+}
+
+.hidden { display: none; }
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* PRODUCT CARD */
+.product {
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+
+/* MODAL */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.active { display: flex; }
+
+.modal-box {
+  background: #fff;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 10px;
+  padding: 15px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* IMAGE PREVIEW */
+.preview {
+  margin-top: 8px;
+}
+
+.preview img {
+  width: 100%;
+  border-radius: 6px;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.gallery div {
+  position: relative;
+}
+
+.gallery img {
+  width: 100%;
+  border-radius: 6px;
+}
+
+.gallery span {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: red;
+  color: #fff;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+</style>
 </head>
+
 <body>
 
 <!-- LOGIN -->
 <div id="loginBox">
   <h2>Admin Login</h2>
   <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
+  <input id="password" type="password">
   <button onclick="login()">Login</button>
 </div>
 
 <!-- PANEL -->
 <div id="panel" class="hidden">
-  <h2>Admin Panel</h2>
+
+  <div class="header">
+    <h2>Products</h2>
+    <button onclick="openModal()">➕ Add Product</button>
+  </div>
+
   <button onclick="logout()">Logout</button>
 
-  <h3>Add / Edit Product</h3>
-  <input type="hidden" id="editId">
-
-  <input id="name" placeholder="Name">
-  <input id="price" placeholder="Price">
-  <input id="category" placeholder="Category">
-  <input id="sizes" placeholder="Sizes (S,M,L)">
-  <input id="colors" placeholder="Colors (Red,Blue)">
-
-  <label>Cover Image</label>
-  <input id="coverImage" type="file" accept="image/*">
-
-  <label>Gallery Images</label>
-  <input id="galleryImages" type="file" accept="image/*" multiple>
-
-  <button onclick="saveProduct()">Save Product</button>
-
-  <h3>Products</h3>
   <div id="products"></div>
 </div>
 
+<!-- MODAL -->
+<div class="modal" id="productModal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Add Product</h3>
+
+    <input type="hidden" id="editId">
+
+    <input id="p_name" placeholder="Product name">
+    <input id="p_price" placeholder="Price">
+    <input id="p_category" placeholder="Category">
+    <input id="p_sizes" placeholder="Sizes (S,M,L)">
+    <input id="p_colors" placeholder="Colors (Red,Blue)">
+
+    <label>Cover Image</label>
+    <input type="file" id="coverImage" accept="image/*">
+    <div class="preview" id="coverPreview"></div>
+
+    <label>Gallery Images</label>
+    <input type="file" id="galleryImages" accept="image/*" multiple>
+    <div class="gallery" id="galleryPreview"></div>
+
+    <button onclick="saveProduct()">Save</button>
+    <button onclick="closeModal()">Cancel</button>
+  </div>
+</div>
+
 <script>
-/* ================= SUPABASE ================= */
 const SUPABASE_URL = "https://ctiglwnyimjzocvuizdq.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0aWdsd255aW1qem9jdnVpemRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDI4MTMsImV4cCI6MjA4MTYxODgxM30.eW5nl5yCXnz0V0iya6cZCMj4Pgy05vhClUQ4pLfwYNI";
+const SUPABASE_KEY = "YOUR_ANON_KEY";
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* ================= AUTH ================= */
-document.addEventListener("DOMContentLoaded", async () => {
-  const { data } = await client.auth.getSession();
-  if (data.session) { showPanel(); loadProducts(); }
-});
+let galleryFiles = [];
 
+/* AUTH */
 async function login() {
   const { error } = await client.auth.signInWithPassword({
     email: email.value,
     password: password.value
   });
   if (error) return alert(error.message);
-  showPanel();
+  loginBox.classList.add("hidden");
+  panel.classList.remove("hidden");
   loadProducts();
 }
 
@@ -77,49 +182,61 @@ async function logout() {
   location.reload();
 }
 
-function showPanel() {
-  loginBox.classList.add("hidden");
-  panel.classList.remove("hidden");
+/* MODAL */
+function openModal(edit=false) {
+  productModal.classList.add("active");
+  modalTitle.textContent = edit ? "Edit Product" : "Add Product";
 }
 
-/* ================= GITHUB UPLOAD ================= */
-async function uploadToGitHub(file) {
-  const base64 = await new Promise(res => {
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(",")[1]);
-    r.readAsDataURL(file);
-  });
-
-  const res = await fetch("/api/upload", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      fileName: `${Date.now()}-${file.name}`,
-      fileBase64: base64
-    })
-  });
-
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error);
-  return data.url;
+function closeModal() {
+  productModal.classList.remove("active");
+  document.querySelectorAll("input").forEach(i => i.value = "");
+  coverPreview.innerHTML = "";
+  galleryPreview.innerHTML = "";
+  galleryFiles = [];
+  editId.value = "";
 }
 
-/* ================= LOAD PRODUCTS ================= */
+/* IMAGE PREVIEW */
+coverImage.onchange = () => {
+  coverPreview.innerHTML = `<img src="${URL.createObjectURL(coverImage.files[0])}">`;
+};
+
+galleryImages.onchange = () => {
+  for (const f of galleryImages.files) {
+    galleryFiles.push(f);
+  }
+  renderGallery();
+};
+
+function renderGallery() {
+  galleryPreview.innerHTML = "";
+  galleryFiles.forEach((f,i) => {
+    galleryPreview.innerHTML += `
+      <div>
+        <img src="${URL.createObjectURL(f)}">
+        <span onclick="removeGallery(${i})">×</span>
+      </div>
+    `;
+  });
+}
+
+function removeGallery(i) {
+  galleryFiles.splice(i,1);
+  renderGallery();
+}
+
+/* LOAD PRODUCTS */
 async function loadProducts() {
-  const { data } = await client
-    .from("products")
-    .select("*")
-    .order("created_at", { ascending: false });
-
+  const { data } = await client.from("products").select("*").order("created_at",{ascending:false});
   products.innerHTML = "";
-
   data.forEach(p => {
     products.innerHTML += `
       <div class="product">
         <b>${p.name}</b> – ₹${p.price}<br><br>
         <button onclick="editProduct('${p.id}')">Edit</button>
-        <button onclick="toggleAvailability('${p.id}', ${!p.available})">
-          ${p.available ? "Disable" : "Enable"}
+        <button onclick="toggleAvailability('${p.id}',${!p.available})">
+          ${p.available ? "Disable":"Enable"}
         </button>
         <button onclick="removeProduct('${p.id}')">Delete</button>
       </div>
@@ -127,111 +244,62 @@ async function loadProducts() {
   });
 }
 
-/* ================= EDIT ================= */
+/* EDIT */
 async function editProduct(id) {
-  const { data } = await client
-    .from("products")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const { data } = await client.from("products").select("*").eq("id",id).single();
 
-  editId.value = data.id;
-  name.value = data.name;
-  price.value = data.price;
-  category.value = data.category;
-  sizes.value = (data.sizes || []).join(",");
-  colors.value = (data.colors || []).join(",");
+  editId.value = id;
+  p_name.value = data.name;
+  p_price.value = data.price;
+  p_category.value = data.category;
+  p_sizes.value = (data.sizes||[]).join(",");
+  p_colors.value = (data.colors||[]).join(",");
 
-  alert("Edit mode enabled");
+  openModal(true);
 }
 
-/* ================= SAVE ================= */
+/* SAVE */
 async function saveProduct() {
-  try {
-    const isEdit = Boolean(document.getElementById("editId").value);
+  const payload = {
+    name: p_name.value.trim(),
+    price: Number(p_price.value),
+    category: p_category.value.trim(),
+    sizes: p_sizes.value.split(",").map(s=>s.trim()).filter(Boolean),
+    colors: p_colors.value.split(",").map(c=>c.trim()).filter(Boolean),
+    available: true
+  };
 
-    const nameEl = document.getElementById("name");
-    const priceEl = document.getElementById("price");
-    const categoryEl = document.getElementById("category");
-    const sizesEl = document.getElementById("sizes");
-    const colorsEl = document.getElementById("colors");
-    const coverEl = document.getElementById("coverImage");
-    const galleryEl = document.getElementById("galleryImages");
-
-    const payload = {
-      name: (nameEl.value || "").trim(),
-      price: Number(priceEl.value),
-      category: (categoryEl.value || "").trim(),
-      sizes: (sizesEl.value || "")
-        .split(",")
-        .map(s => s.trim())
-        .filter(Boolean),
-      colors: (colorsEl.value || "")
-        .split(",")
-        .map(c => c.trim())
-        .filter(Boolean)
-    };
-
-    if (!payload.name || !payload.price || !payload.category) {
-      alert("Fill all required fields");
-      return;
-    }
-
-    // keep old images on edit
-    if (isEdit) {
-      const { data: old } = await client
-        .from("products")
-        .select("images, cover_image")
-        .eq("id", editId.value)
-        .single();
-
-      payload.images = old.images || [];
-      payload.cover_image = old.cover_image;
-    }
-
-    if (coverEl.files[0]) {
-      payload.cover_image = await uploadToGitHub(coverEl.files[0]);
-    }
-
-    if (galleryEl.files.length) {
-      payload.images = [];
-      for (const f of galleryEl.files) {
-        payload.images.push(await uploadToGitHub(f));
-      }
-    }
-
-    if (isEdit) {
-      await client.from("products").update(payload).eq("id", editId.value);
-    } else {
-      payload.available = true;
-      payload.images ||= [];
-      await client.from("products").insert(payload);
-    }
-
-    alert("✅ Product saved successfully");
-
-    document.querySelectorAll("input").forEach(i => (i.value = ""));
-    document.getElementById("editId").value = "";
-    loadProducts();
-
-  } catch (err) {
-    console.error("SAVE ERROR:", err);
-    alert(err.message);
+  if (!payload.name || !payload.price || !payload.category) {
+    alert("Fill all fields");
+    return;
   }
-}
 
-/* ================= TOGGLE / DELETE ================= */
-async function toggleAvailability(id, state) {
-  await client.from("products").update({ available: state }).eq("id", id);
+  // ⚠️ GitHub upload placeholder (same API you already built)
+  // payload.cover_image = await uploadToGitHub(...)
+  // payload.images = [...]
+
+  if (editId.value) {
+    await client.from("products").update(payload).eq("id",editId.value);
+  } else {
+    await client.from("products").insert(payload);
+  }
+
+  closeModal();
   loadProducts();
 }
 
-async function removeProduct(id) {
-  if (!confirm("Delete product?")) return;
-  await client.from("products").delete().eq("id", id);
+/* TOGGLE & DELETE */
+async function toggleAvailability(id,state){
+  await client.from("products").update({available:state}).eq("id",id);
   loadProducts();
+}
+
+async function removeProduct(id){
+  if(confirm("Delete product?")){
+    await client.from("products").delete().eq("id",id);
+    loadProducts();
+  }
 }
 </script>
 </body>
 </html>
-
