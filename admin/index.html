@@ -273,7 +273,7 @@ body {
 
 <script>
 const SUPABASE_URL = "https://ctiglwnyimjzocvuizdq.supabase.co";
-const SUPABASE_KEY = "YOUR_ANON_KEY";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0aWdsd255aW1qem9jdnVpemRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDI4MTMsImV4cCI6MjA4MTYxODgxM30.eW5nl5yCXnz0V0iya6cZCMj4Pgy05vhClUQ4pLfwYNI";
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let editId = null;
@@ -323,11 +323,96 @@ function removeImg(i){
   renderGallery();
 }
 
-/* SAVE */
-async function saveProduct(){
-  alert("Here you already know the Supabase insert/update logic 😉");
-  closeModal();
+async function uploadToGitHub(file) {
+  const base64 = await new Promise(res => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(",")[1]);
+    r.readAsDataURL(file);
+  });
+
+  const res = await fetch("/api/upload", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fileName: `${Date.now()}-${file.name}`,
+      fileBase64: base64
+    })
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error);
+  return data.url;
 }
+
+  
+/* SAVE */
+async function saveProduct() {
+  const nameVal = name.value.trim();
+  const priceVal = price.value.trim();
+  const categoryVal = category.value.trim();
+
+  if (!nameVal || !priceVal || !categoryVal) {
+    alert("Fill all required fields");
+    return;
+  }
+
+  const payload = {
+    name: nameVal,
+    price: Number(priceVal),
+    category: categoryVal,
+    sizes: sizes.value.split(",").map(s => s.trim()).filter(Boolean),
+    colors: colors.value.split(",").map(c => c.trim()).filter(Boolean),
+  };
+
+  try {
+    /* COVER IMAGE */
+    if (coverImage.files.length) {
+      payload.cover_image = await uploadToGitHub(coverImage.files[0]);
+    }
+
+    /* GALLERY IMAGES */
+    if (galleryFiles.length) {
+      payload.images = [];
+      for (const file of galleryFiles) {
+        payload.images.push(await uploadToGitHub(file));
+      }
+    }
+
+    let res;
+    if (editId) {
+      // UPDATE
+      res = await client
+        .from("products")
+        .update(payload)
+        .eq("id", editId);
+    } else {
+      // INSERT
+      payload.available = true;
+      payload.images ||= [];
+      res = await client.from("products").insert(payload);
+    }
+
+    if (res.error) throw res.error;
+
+    /* RESET */
+    editId = null;
+    name.value = price.value = category.value = sizes.value = colors.value = "";
+    coverImage.value = "";
+    galleryImages.value = "";
+    galleryFiles = [];
+    coverPreview.innerHTML = "";
+    galleryPreview.innerHTML = "";
+
+    closeModal();
+    loadProducts();
+    alert("✅ Product saved successfully");
+
+  } catch (err) {
+    console.error("SAVE ERROR:", err);
+    alert(err.message);
+  }
+}
+
 
 /* LOGOUT */
 async function logout(){
@@ -337,3 +422,4 @@ async function logout(){
 </script>
 </body>
 </html>
+
