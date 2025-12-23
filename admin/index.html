@@ -187,13 +187,13 @@ async function saveProduct() {
   }
 
   let payload = {
-    name,
-    price: Number(price),
-    category,
-    sizes: sizes,          // ALWAYS ARRAY
-    colors: colors,        // ALWAYS ARRAY
-    images: []             // ALWAYS ARRAY
-  };
+  name,
+  price: Number(price),
+  category,
+  sizes,
+  colors,
+  available: true
+};
 
   try {
     // cover image
@@ -250,4 +250,5 @@ async function removeProduct(id) {
 </script>
 </body>
 </html>
+
 
