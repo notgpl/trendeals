@@ -148,14 +148,28 @@ async function editProduct(id) {
 /* ================= SAVE ================= */
 async function saveProduct() {
   try {
-    const isEdit = Boolean(editId.value);
+    const isEdit = Boolean(document.getElementById("editId").value);
+
+    const nameEl = document.getElementById("name");
+    const priceEl = document.getElementById("price");
+    const categoryEl = document.getElementById("category");
+    const sizesEl = document.getElementById("sizes");
+    const colorsEl = document.getElementById("colors");
+    const coverEl = document.getElementById("coverImage");
+    const galleryEl = document.getElementById("galleryImages");
 
     const payload = {
-      name: name.value.trim(),
-      price: Number(price.value),
-      category: category.value.trim(),
-      sizes: sizes.value.split(",").map(s => s.trim()).filter(Boolean),
-      colors: colors.value.split(",").map(c => c.trim()).filter(Boolean)
+      name: (nameEl.value || "").trim(),
+      price: Number(priceEl.value),
+      category: (categoryEl.value || "").trim(),
+      sizes: (sizesEl.value || "")
+        .split(",")
+        .map(s => s.trim())
+        .filter(Boolean),
+      colors: (colorsEl.value || "")
+        .split(",")
+        .map(c => c.trim())
+        .filter(Boolean)
     };
 
     if (!payload.name || !payload.price || !payload.category) {
@@ -163,7 +177,7 @@ async function saveProduct() {
       return;
     }
 
-    // keep old images if editing
+    // keep old images on edit
     if (isEdit) {
       const { data: old } = await client
         .from("products")
@@ -175,13 +189,13 @@ async function saveProduct() {
       payload.cover_image = old.cover_image;
     }
 
-    if (coverImage.files[0]) {
-      payload.cover_image = await uploadToGitHub(coverImage.files[0]);
+    if (coverEl.files[0]) {
+      payload.cover_image = await uploadToGitHub(coverEl.files[0]);
     }
 
-    if (galleryImages.files.length) {
+    if (galleryEl.files.length) {
       payload.images = [];
-      for (const f of galleryImages.files) {
+      for (const f of galleryEl.files) {
         payload.images.push(await uploadToGitHub(f));
       }
     }
@@ -194,13 +208,14 @@ async function saveProduct() {
       await client.from("products").insert(payload);
     }
 
-    alert("✅ Product saved");
-    document.querySelectorAll("input").forEach(i => i.value = "");
-    editId.value = "";
+    alert("✅ Product saved successfully");
+
+    document.querySelectorAll("input").forEach(i => (i.value = ""));
+    document.getElementById("editId").value = "";
     loadProducts();
 
   } catch (err) {
-    console.error(err);
+    console.error("SAVE ERROR:", err);
     alert(err.message);
   }
 }
@@ -219,3 +234,4 @@ async function removeProduct(id) {
 </script>
 </body>
 </html>
+
