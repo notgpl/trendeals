@@ -1,149 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Trendeals Admin</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f4f6f8;
-  max-width: 600px;
-  margin: auto;
-  padding: 15px;
+:root{
+  --primary:#8e44ad;
+  --bg:#faf6fb;
+  --card:#ffffff;
+  --text:#2c2c2c;
 }
 
-button {
-  padding: 10px;
-  width: 100%;
-  cursor: pointer;
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family: "Segoe UI", sans-serif;
+  background:var(--bg);
+  color:var(--text);
 }
 
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 6px 0;
+/* ================= TOP BAR ================= */
+.topbar{
+  background:var(--card);
+  padding:15px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  box-shadow:0 2px 10px rgba(0,0,0,.05);
 }
 
-.hidden { display: none; }
+.logo{
+  font-size:22px;
+  font-weight:800;
+}
+.logo span{color:var(--primary)}
 
-/* HEADER */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.hamburger{
+  font-size:22px;
+  cursor:pointer;
 }
 
-/* PRODUCT CARD */
-.product {
-  background: #fff;
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+/* ================= MENU ================= */
+.menu{
+  position:fixed;
+  top:0; right:-260px;
+  width:260px; height:100%;
+  background:#fff;
+  box-shadow:-5px 0 20px rgba(0,0,0,.1);
+  padding:20px;
+  transition:.3s;
+}
+.menu.active{right:0}
+
+.menu button{
+  width:100%;
+  padding:12px;
+  border:none;
+  background:#eee;
+  cursor:pointer;
+  border-radius:8px;
+  margin-top:20px;
 }
 
-/* MODAL */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.5);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+/* ================= MAIN ================= */
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:25px;
 }
 
-.modal.active { display: flex; }
-
-.modal-box {
-  background: #fff;
-  width: 100%;
-  max-width: 500px;
-  border-radius: 10px;
-  padding: 15px;
-  max-height: 90vh;
-  overflow-y: auto;
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
 }
 
-/* IMAGE PREVIEW */
-.preview {
-  margin-top: 8px;
+.add-btn{
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  padding:12px 18px;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:15px;
 }
 
-.preview img {
-  width: 100%;
-  border-radius: 6px;
+/* ================= PRODUCT LIST ================= */
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:18px;
 }
 
-.gallery {
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 8px;
-  margin-top: 8px;
+.product-card{
+  background:#fff;
+  border-radius:14px;
+  padding:15px;
+  box-shadow:0 5px 15px rgba(0,0,0,.06);
 }
 
-.gallery div {
-  position: relative;
+.product-card img{
+  width:100%;
+  height:180px;
+  object-fit:cover;
+  border-radius:10px;
 }
 
-.gallery img {
-  width: 100%;
-  border-radius: 6px;
+.product-card h4{margin:10px 0 5px}
+.product-card p{margin:0;font-weight:600}
+
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+.actions button{
+  flex:1;
+  padding:8px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+.edit{background:#f1c40f}
+.del{background:#e74c3c;color:#fff}
+
+/* ================= MODAL ================= */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:50;
+}
+.modal.active{display:flex}
+
+.modal-box{
+  background:#fff;
+  width:95%;
+  max-width:500px;
+  padding:20px;
+  border-radius:16px;
+  max-height:90vh;
+  overflow:auto;
 }
 
-.gallery span {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  background: red;
-  color: #fff;
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 50%;
-  cursor: pointer;
+.modal-box h3{margin-top:0}
+
+.modal-box input{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+}
+
+.preview{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+
+.preview div{
+  position:relative;
+}
+.preview img{
+  width:70px;height:70px;
+  object-fit:cover;
+  border-radius:8px;
+}
+.preview span{
+  position:absolute;
+  top:-6px; right:-6px;
+  background:red;
+  color:#fff;
+  width:18px;height:18px;
+  font-size:12px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.save-btn{
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  padding:12px;
+  width:100%;
+  border-radius:10px;
+  margin-top:10px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="loginBox">
-  <h2>Admin Login</h2>
-  <input id="email" placeholder="Email">
-  <input id="password" type="password">
-  <button onclick="login()">Login</button>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">TREN<span>DEALS</span></div>
+  <div class="hamburger" onclick="toggleMenu()">☰</div>
 </div>
 
-<!-- PANEL -->
-<div id="panel" class="hidden">
+<!-- SIDE MENU -->
+<div class="menu" id="menu">
+  <h3>Admin</h3>
+  <button onclick="logout()">Logout</button>
+</div>
 
+<!-- MAIN -->
+<div class="container">
   <div class="header">
     <h2>Products</h2>
-    <button onclick="openModal()">➕ Add Product</button>
+    <button class="add-btn" onclick="openModal()">＋ Add Product</button>
   </div>
 
-  <button onclick="logout()">Logout</button>
-
-  <div id="products"></div>
+  <div class="products" id="products"></div>
 </div>
 
 <!-- MODAL -->
-<div class="modal" id="productModal">
+<div class="modal" id="modal">
   <div class="modal-box">
     <h3 id="modalTitle">Add Product</h3>
 
     <input type="hidden" id="editId">
-
-    <input id="p_name" placeholder="Product name">
-    <input id="p_price" placeholder="Price">
-    <input id="p_category" placeholder="Category">
-    <input id="p_sizes" placeholder="Sizes (S,M,L)">
-    <input id="p_colors" placeholder="Colors (Red,Blue)">
+    <input id="name" placeholder="Product Name">
+    <input id="price" placeholder="Price">
+    <input id="category" placeholder="Category">
+    <input id="sizes" placeholder="Sizes (S,M,L)">
+    <input id="colors" placeholder="Colors (Red,Blue)">
 
     <label>Cover Image</label>
     <input type="file" id="coverImage" accept="image/*">
@@ -151,136 +244,114 @@ input {
 
     <label>Gallery Images</label>
     <input type="file" id="galleryImages" accept="image/*" multiple>
-    <div class="gallery" id="galleryPreview"></div>
+    <div class="preview" id="galleryPreview"></div>
 
-    <button onclick="saveProduct()">Save</button>
-    <button onclick="closeModal()">Cancel</button>
+    <button class="save-btn" onclick="saveProduct()">Save Product</button>
   </div>
 </div>
 
 <script>
-const SUPABASE_URL = "https://ctiglwnyimjzocvuizdq.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0aWdsd255aW1qem9jdnVpemRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDI4MTMsImV4cCI6MjA4MTYxODgxM30.eW5nl5yCXnz0V0iya6cZCMj4Pgy05vhClUQ4pLfwYNI";
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL="https://ctiglwnyimjzocvuizdq.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0aWdsd255aW1qem9jdnVpemRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDI4MTMsImV4cCI6MjA4MTYxODgxM30.eW5nl5yCXnz0V0iya6cZCMj4Pgy05vhClUQ4pLfwYNI";
+const client=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let galleryFiles = [];
+let galleryFiles=[];
 
-/* AUTH */
-async function login() {
-  const { error } = await client.auth.signInWithPassword({
-    email: email.value,
-    password: password.value
-  });
-  if (error) return alert(error.message);
-  loginBox.classList.add("hidden");
-  panel.classList.remove("hidden");
-  loadProducts();
-}
-
-async function logout() {
-  await client.auth.signOut();
-  location.reload();
+/* MENU */
+function toggleMenu(){
+  menu.classList.toggle("active");
 }
 
 /* MODAL */
-function openModal(edit=false) {
-  productModal.classList.add("active");
-  modalTitle.textContent = edit ? "Edit Product" : "Add Product";
+function openModal(edit=false){
+  modal.classList.add("active");
+  document.body.style.overflow="hidden";
+  modalTitle.textContent=edit?"Edit Product":"Add Product";
 }
-
-function closeModal() {
-  productModal.classList.remove("active");
-  document.querySelectorAll("input").forEach(i => i.value = "");
-  coverPreview.innerHTML = "";
-  galleryPreview.innerHTML = "";
-  galleryFiles = [];
-  editId.value = "";
+function closeModal(){
+  modal.classList.remove("active");
+  document.body.style.overflow="";
 }
 
 /* IMAGE PREVIEW */
-coverImage.onchange = () => {
-  coverPreview.innerHTML = `<img src="${URL.createObjectURL(coverImage.files[0])}">`;
-};
-
-galleryImages.onchange = () => {
-  for (const f of galleryImages.files) {
-    galleryFiles.push(f);
+coverImage.onchange=()=>{
+  coverPreview.innerHTML="";
+  if(coverImage.files[0]){
+    const img=document.createElement("img");
+    img.src=URL.createObjectURL(coverImage.files[0]);
+    coverPreview.appendChild(img);
   }
+};
+
+galleryImages.onchange=()=>{
+  galleryFiles=[...galleryImages.files];
   renderGallery();
 };
 
-function renderGallery() {
-  galleryPreview.innerHTML = "";
-  galleryFiles.forEach((f,i) => {
-    galleryPreview.innerHTML += `
-      <div>
-        <img src="${URL.createObjectURL(f)}">
-        <span onclick="removeGallery(${i})">×</span>
-      </div>
-    `;
+function renderGallery(){
+  galleryPreview.innerHTML="";
+  galleryFiles.forEach((f,i)=>{
+    const box=document.createElement("div");
+    const img=document.createElement("img");
+    img.src=URL.createObjectURL(f);
+    const del=document.createElement("span");
+    del.textContent="×";
+    del.onclick=()=>{galleryFiles.splice(i,1);renderGallery();}
+    box.append(img,del);
+    galleryPreview.appendChild(box);
   });
-}
-
-function removeGallery(i) {
-  galleryFiles.splice(i,1);
-  renderGallery();
 }
 
 /* LOAD PRODUCTS */
-async function loadProducts() {
-  const { data } = await client.from("products").select("*").order("created_at",{ascending:false});
-  products.innerHTML = "";
-  data.forEach(p => {
-    products.innerHTML += `
-      <div class="product">
-        <b>${p.name}</b> – ₹${p.price}<br><br>
-        <button onclick="editProduct('${p.id}')">Edit</button>
-        <button onclick="toggleAvailability('${p.id}',${!p.available})">
-          ${p.available ? "Disable":"Enable"}
-        </button>
-        <button onclick="removeProduct('${p.id}')">Delete</button>
-      </div>
-    `;
+async function loadProducts(){
+  const {data}=await client.from("products").select("*").order("created_at",{ascending:false});
+  products.innerHTML="";
+  data.forEach(p=>{
+    products.innerHTML+=`
+      <div class="product-card">
+        <img src="${p.cover_image}">
+        <h4>${p.name}</h4>
+        <p>₹${p.price}</p>
+        <div class="actions">
+          <button class="edit" onclick="editProduct('${p.id}')">Edit</button>
+          <button class="del" onclick="deleteProduct('${p.id}')">Delete</button>
+        </div>
+      </div>`;
   });
 }
+loadProducts();
 
 /* EDIT */
-async function editProduct(id) {
-  const { data } = await client.from("products").select("*").eq("id",id).single();
-
-  editId.value = id;
-  p_name.value = data.name;
-  p_price.value = data.price;
-  p_category.value = data.category;
-  p_sizes.value = (data.sizes||[]).join(",");
-  p_colors.value = (data.colors||[]).join(",");
-
+async function editProduct(id){
+  const {data}=await client.from("products").select("*").eq("id",id).single();
+  editId.value=data.id;
+  name.value=data.name;
+  price.value=data.price;
+  category.value=data.category;
+  sizes.value=(data.sizes||[]).join(",");
+  colors.value=(data.colors||[]).join(",");
   openModal(true);
 }
 
 /* SAVE */
-async function saveProduct() {
-  const payload = {
-    name: p_name.value.trim(),
-    price: Number(p_price.value),
-    category: p_category.value.trim(),
-    sizes: p_sizes.value.split(",").map(s=>s.trim()).filter(Boolean),
-    colors: p_colors.value.split(",").map(c=>c.trim()).filter(Boolean),
-    available: true
+async function saveProduct(){
+  const payload={
+    name:name.value.trim(),
+    price:Number(price.value),
+    category:category.value.trim(),
+    sizes:sizes.value.split(",").map(s=>s.trim()),
+    colors:colors.value.split(",").map(c=>c.trim()),
+    available:true
   };
 
-  if (!payload.name || !payload.price || !payload.category) {
+  if(!payload.name||!payload.price||!payload.category){
     alert("Fill all fields");
     return;
   }
 
-  // ⚠️ GitHub upload placeholder (same API you already built)
-  // payload.cover_image = await uploadToGitHub(...)
-  // payload.images = [...]
-
-  if (editId.value) {
+  if(editId.value){
     await client.from("products").update(payload).eq("id",editId.value);
-  } else {
+  }else{
     await client.from("products").insert(payload);
   }
 
@@ -288,19 +359,19 @@ async function saveProduct() {
   loadProducts();
 }
 
-/* TOGGLE & DELETE */
-async function toggleAvailability(id,state){
-  await client.from("products").update({available:state}).eq("id",id);
-  loadProducts();
-}
-
-async function removeProduct(id){
+/* DELETE */
+async function deleteProduct(id){
   if(confirm("Delete product?")){
     await client.from("products").delete().eq("id",id);
     loadProducts();
   }
 }
+
+/* LOGOUT */
+async function logout(){
+  await client.auth.signOut();
+  location.reload();
+}
 </script>
 </body>
 </html>
-
