@@ -1,5 +1,3 @@
-import fetch from "node-fetch";
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -12,35 +10,38 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing data" });
     }
 
-    const repo = process.env.GITHUB_REPO;
-    const token = process.env.GITHUB_TOKEN;
-    const path = process.env.GITHUB_IMAGES_PATH;
+    const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+    const OWNER = "notgpl";
+    const REPO = "trendeals";
+    const PATH = `uploads/${fileName}`;
 
-    const apiUrl = `https://api.github.com/repos/${repo}/contents/${path}/${fileName}`;
-
-    const githubRes = await fetch(apiUrl, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        Accept: "application/vnd.github+json"
-      },
-      body: JSON.stringify({
-        message: `Upload image ${fileName}`,
-        content: fileBase64
-      })
-    });
+    const githubRes = await fetch(
+      `https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${GITHUB_TOKEN}`,
+          "Content-Type": "application/json",
+          Accept: "application/vnd.github+json"
+        },
+        body: JSON.stringify({
+          message: "upload image",
+          content: fileBase64
+        })
+      }
+    );
 
     const data = await githubRes.json();
 
     if (!githubRes.ok) {
-      return res.status(500).json(data);
+      return res.status(500).json({ error: data.message });
     }
 
-    const publicUrl = `https://raw.githubusercontent.com/${repo}/main/${path}/${fileName}`;
+    return res.status(200).json({
+      url: data.content.download_url
+    });
 
-    res.status(200).json({ url: publicUrl });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 }
