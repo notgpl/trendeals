@@ -190,57 +190,96 @@ async function editProduct(id) {
 
 /* ================= ADD / UPDATE ================= */
 async function addProduct() {
-  const editIdVal = editId.value;
+  const editIdVal = document.getElementById("editId").value;
 
-  const nameVal = name.value.trim();
-  const priceVal = price.value.trim();
-  const categoryVal = category.value.trim();
+  const nameEl = document.getElementById("name");
+  const priceEl = document.getElementById("price");
+  const categoryEl = document.getElementById("category");
+  const sizesEl = document.getElementById("sizes");
+  const colorsEl = document.getElementById("colors");
 
-  if (!nameVal || !priceVal || !categoryVal) {
+  const coverInput = document.getElementById("coverImage");
+  const galleryInput = document.getElementById("galleryImages");
+
+  const name = nameEl.value.trim();
+  const price = priceEl.value.trim();
+  const category = categoryEl.value.trim();
+
+  if (!name || !price || !category) {
     alert("Fill all required fields");
     return;
   }
 
-  const sizesArr = sizes.value.split(",").map(s => s.trim()).filter(Boolean);
-  const colorsArr = colors.value.split(",").map(c => c.trim()).filter(Boolean);
+  const sizes = sizesEl.value
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  const colors = colorsEl.value
+    .split(",")
+    .map(c => c.trim())
+    .filter(Boolean);
 
   let payload = {
-    name: nameVal,
-    price: Number(priceVal),
-    category: categoryVal,
-    sizes: sizesArr,
-    colors: colorsArr
+    name,
+    price: Number(price),
+    category,
+    sizes,
+    colors
   };
 
-  if (coverImage.files.length) {
-    payload.cover_image = await uploadSingleImage(coverImage.files[0]);
-  }
-
-  if (galleryImages.files.length) {
-    payload.images = await uploadGalleryImages(galleryImages.files);
-  }
-
-  let result;
-  if (editIdVal) {
-    result = await client.from("products").update(payload).eq("id", editIdVal);
-  } else {
-    if (!payload.cover_image) {
-      alert("Cover image required");
-      return;
+  try {
+    // upload cover if selected
+    if (coverInput.files.length) {
+      payload.cover_image = await uploadSingleImage(coverInput.files[0]);
     }
-    payload.images ||= [];
-    payload.available = true;
-    result = await client.from("products").insert(payload);
+
+    // upload gallery images if selected
+    if (galleryInput.files.length) {
+      payload.images = await uploadGalleryImages(galleryInput.files);
+    }
+
+    let result;
+    if (editIdVal) {
+      // ✏️ UPDATE
+      result = await client
+        .from("products")
+        .update(payload)
+        .eq("id", editIdVal);
+    } else {
+      // ➕ INSERT
+      if (!payload.cover_image) {
+        alert("Cover image is required");
+        return;
+      }
+
+      payload.available = true;
+      payload.images ||= [];
+
+      result = await client.from("products").insert(payload);
+    }
+
+    if (result.error) throw result.error;
+
+    // reset form
+    document.getElementById("editId").value = "";
+    nameEl.value = "";
+    priceEl.value = "";
+    categoryEl.value = "";
+    sizesEl.value = "";
+    colorsEl.value = "";
+    coverInput.value = "";
+    galleryInput.value = "";
+
+    loadProducts();
+    alert("Product saved successfully ✅");
+
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
   }
-
-  if (result.error) return alert(result.error.message);
-
-  editId.value = "";
-  name.value = price.value = category.value = sizes.value = colors.value = "";
-  coverImage.value = galleryImages.value = "";
-
-  loadProducts();
 }
+
 
 /* ================= TOGGLE / DELETE ================= */
 async function toggleAvailability(id, state) {
@@ -257,4 +296,5 @@ async function removeProduct(id) {
 
 </body>
 </html>
+
 
