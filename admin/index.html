@@ -36,47 +36,48 @@
 <div id="loginBox">
   <h2>Admin Login</h2>
   <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
+  <input id="password" type="password">
   <button onclick="login()">Login</button>
 </div>
 
 <!-- ADMIN PANEL -->
 <div id="panel" class="hidden">
   <h2>Admin Panel</h2>
-
   <button onclick="logout()">Logout</button>
 
-  <h3>Add Product</h3>
+  <h3>Add / Edit Product</h3>
+
+  <!-- hidden edit id -->
+  <input type="hidden" id="editId">
+
   <input id="name" placeholder="Name">
   <input id="price" placeholder="Price">
   <input id="category" placeholder="Category">
   <input id="sizes" placeholder="Sizes (comma separated)">
   <input id="colors" placeholder="Colors (comma separated)">
-  
-  <label>Cover Image</label>
-<input id="coverImage" type="file" accept="image/*">
 
-<label>Product Images (Gallery)</label>
-<input id="galleryImages" type="file" accept="image/*" multiple>
-  
-  <button onclick="addProduct()">Add Product</button>
+  <label>Cover Image</label>
+  <input id="coverImage" type="file" accept="image/*">
+
+  <label>Product Images (Gallery)</label>
+  <input id="galleryImages" type="file" accept="image/*" multiple>
+
+  <button onclick="addProduct()">Save Product</button>
 
   <h3>Products</h3>
   <div id="products"></div>
 </div>
 
 <script>
-  // 🔑 SUPABASE CONFIG
-  const SUPABASE_URL = "https://ctiglwnyimjzocvuizdq.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0aWdsd255aW1qem9jdnVpemRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDI4MTMsImV4cCI6MjA4MTYxODgxM30.eW5nl5yCXnz0V0iya6cZCMj4Pgy05vhClUQ4pLfwYNI";
+/* ================= SUPABASE ================= */
+const SUPABASE_URL = "https://ctiglwnyimjzocvuizdq.supabase.co";
+const SUPABASE_KEY = "YOUR_ANON_KEY_HERE";
 
-  const client = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  async function uploadSingleImage(file) {
-  const fileName = `cover-${Date.now()}-${file.name}`;
+/* ================= IMAGE UPLOAD ================= */
+async function uploadSingleImage(file) {
+  const fileName = `cover-${crypto.randomUUID()}-${file.name}`;
 
   const { error } = await client.storage
     .from("products")
@@ -93,7 +94,7 @@ async function uploadGalleryImages(files) {
   const urls = [];
 
   for (const file of files) {
-    const fileName = `gallery-${Date.now()}-${file.name}`;
+    const fileName = `gallery-${crypto.randomUUID()}-${file.name}`;
 
     const { error } = await client.storage
       .from("products")
@@ -101,186 +102,158 @@ async function uploadGalleryImages(files) {
 
     if (error) throw error;
 
-    const { data } = client.storage
-      .from("products")
-      .getPublicUrl(fileName);
-
-    urls.push(data.publicUrl);
+    urls.push(
+      client.storage.from("products").getPublicUrl(fileName).data.publicUrl
+    );
   }
 
   return urls;
 }
 
-
-  const loginBox = document.getElementById("loginBox");
-  const panel = document.getElementById("panel");
-
-  // 🔁 Restore session on refresh
-  document.addEventListener("DOMContentLoaded", async () => {
-    const { data } = await client.auth.getSession();
-    if (data.session) {
-      showPanel();
-      loadProducts();
-    }
-  });
-
-  // 🔐 LOGIN
-  async function login() {
-    const { error } = await client.auth.signInWithPassword({
-      email: email.value,
-      password: password.value
-    });
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
+/* ================= AUTH ================= */
+document.addEventListener("DOMContentLoaded", async () => {
+  const { data } = await client.auth.getSession();
+  if (data.session) {
     showPanel();
     loadProducts();
   }
+});
 
-  // 🔓 LOGOUT
-  async function logout() {
-    await client.auth.signOut();
-    location.reload();
-  }
+async function login() {
+  const { error } = await client.auth.signInWithPassword({
+    email: email.value,
+    password: password.value
+  });
 
-  function showPanel() {
-    loginBox.classList.add("hidden");
-    panel.classList.remove("hidden");
-  }
+  if (error) return alert(error.message);
 
-  // 📦 LOAD PRODUCTS
-  async function loadProducts() {
-    const { data, error } = await client
-      .from("products")
-      .select("*")
-      .order("created_at", { ascending: false });
+  showPanel();
+  loadProducts();
+}
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
+async function logout() {
+  await client.auth.signOut();
+  location.reload();
+}
 
-    const box = document.getElementById("products");
-    box.innerHTML = "";
+function showPanel() {
+  loginBox.classList.add("hidden");
+  panel.classList.remove("hidden");
+}
 
-    data.forEach(p => {
-      box.innerHTML += `
-        <div class="product">
-          <b>${p.name}</b> – ₹${p.price}<br><br>
-          <button onclick="toggleAvailability('${p.id}', ${!p.available})">
-            ${p.available ? "Disable" : "Enable"}
-          </button>
-          <button onclick="removeProduct('${p.id}')">
-            Delete
-          </button>
-        </div>
-      `;
-    });
-  }
+/* ================= LOAD PRODUCTS ================= */
+async function loadProducts() {
+  const { data, error } = await client
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending: false });
 
- // ➕ ADD PRODUCT
+  if (error) return alert(error.message);
+
+  const box = document.getElementById("products");
+  box.innerHTML = "";
+
+  data.forEach(p => {
+    box.innerHTML += `
+      <div class="product">
+        <b>${p.name}</b> – ₹${p.price}<br><br>
+
+        <button onclick="editProduct('${p.id}')">Edit</button>
+        <button onclick="toggleAvailability('${p.id}', ${!p.available})">
+          ${p.available ? "Disable" : "Enable"}
+        </button>
+        <button onclick="removeProduct('${p.id}')">Delete</button>
+      </div>
+    `;
+  });
+}
+
+/* ================= EDIT PRODUCT ================= */
+async function editProduct(id) {
+  const { data, error } = await client
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) return alert(error.message);
+
+  editId.value = data.id;
+  name.value = data.name;
+  price.value = data.price;
+  category.value = data.category;
+  sizes.value = (data.sizes || []).join(",");
+  colors.value = (data.colors || []).join(",");
+
+  alert("Edit mode enabled. Modify fields and click Save Product.");
+}
+
+/* ================= ADD / UPDATE ================= */
 async function addProduct() {
-  const name = document.getElementById("name").value.trim();
-  const price = document.getElementById("price").value.trim();
-  const category = document.getElementById("category").value.trim();
+  const editIdVal = editId.value;
 
-  const sizesInput = document.getElementById("sizes");
-  const colorsInput = document.getElementById("colors");
+  const nameVal = name.value.trim();
+  const priceVal = price.value.trim();
+  const categoryVal = category.value.trim();
 
-  const coverInput = document.getElementById("coverImage");
-  const galleryInput = document.getElementById("galleryImages");
-
-  if (!name || !price || !category || coverInput.files.length === 0) {
-    alert("Fill all fields correctly");
+  if (!nameVal || !priceVal || !categoryVal) {
+    alert("Fill all required fields");
     return;
   }
 
-  // ✅ READ SIZES & COLORS
-  const sizes = sizesInput.value
-    .split(",")
-    .map(s => s.trim())
-    .filter(Boolean);
+  const sizesArr = sizes.value.split(",").map(s => s.trim()).filter(Boolean);
+  const colorsArr = colors.value.split(",").map(c => c.trim()).filter(Boolean);
 
-  const colors = colorsInput.value
-    .split(",")
-    .map(c => c.trim())
-    .filter(Boolean);
+  let payload = {
+    name: nameVal,
+    price: Number(priceVal),
+    category: categoryVal,
+    sizes: sizesArr,
+    colors: colorsArr
+  };
 
-  try {
-    // 📤 Upload cover image
-    const coverUrl = await uploadSingleImage(coverInput.files[0]);
-
-    // 📤 Upload gallery images (multiple)
-    const galleryUrls = galleryInput.files.length
-      ? await uploadGalleryImages(galleryInput.files)
-      : [];
-
-    // 🧾 INSERT INTO DATABASE
-    const { error } = await client.from("products").insert({
-      name,
-      price: Number(price),
-      category,
-      cover_image: coverUrl,
-      images: galleryUrls,
-      sizes,
-      colors,
-      available: true
-    });
-
-    if (error) throw error;
-
-    // 🔄 RESET FORM
-    document.getElementById("name").value = "";
-    document.getElementById("price").value = "";
-    document.getElementById("category").value = "";
-    sizesInput.value = "";
-    colorsInput.value = "";
-    coverInput.value = "";
-    galleryInput.value = "";
-
-    loadProducts();
-  } catch (err) {
-    console.error(err);
-    alert(err.message);
+  if (coverImage.files.length) {
+    payload.cover_image = await uploadSingleImage(coverImage.files[0]);
   }
+
+  if (galleryImages.files.length) {
+    payload.images = await uploadGalleryImages(galleryImages.files);
+  }
+
+  let result;
+  if (editIdVal) {
+    result = await client.from("products").update(payload).eq("id", editIdVal);
+  } else {
+    if (!payload.cover_image) {
+      alert("Cover image required");
+      return;
+    }
+    payload.images ||= [];
+    payload.available = true;
+    result = await client.from("products").insert(payload);
+  }
+
+  if (result.error) return alert(result.error.message);
+
+  editId.value = "";
+  name.value = price.value = category.value = sizes.value = colors.value = "";
+  coverImage.value = galleryImages.value = "";
+
+  loadProducts();
 }
 
-
+/* ================= TOGGLE / DELETE ================= */
 async function toggleAvailability(id, state) {
-  const { error } = await client
-    .from("products")
-    .update({ available: state })
-    .eq("id", id);
-
-  if (error) alert(error.message);
+  await client.from("products").update({ available: state }).eq("id", id);
   loadProducts();
 }
 
 async function removeProduct(id) {
   if (!confirm("Delete this product?")) return;
-
-  const { error } = await client
-    .from("products")
-    .delete()
-    .eq("id", id);
-
-  if (error) alert(error.message);
+  await client.from("products").delete().eq("id", id);
   loadProducts();
 }
-
-  
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
