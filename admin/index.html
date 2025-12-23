@@ -161,6 +161,80 @@ async function saveProduct() {
   loadProducts();
 }
 
+  async function addProduct() {
+  const editIdVal = document.getElementById("editId").value;
+
+  const name = document.getElementById("name").value.trim();
+  const price = document.getElementById("price").value.trim();
+  const category = document.getElementById("category").value.trim();
+
+  const sizes = document.getElementById("sizes").value
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  const colors = document.getElementById("colors").value
+    .split(",")
+    .map(c => c.trim())
+    .filter(Boolean);
+
+  const coverInput = document.getElementById("coverImage");
+  const galleryInput = document.getElementById("galleryImages");
+
+  if (!name || !price || !category) {
+    alert("Fill all required fields");
+    return;
+  }
+
+  let payload = {
+    name,
+    price: Number(price),
+    category,
+    sizes: sizes,          // ALWAYS ARRAY
+    colors: colors,        // ALWAYS ARRAY
+    images: []             // ALWAYS ARRAY
+  };
+
+  try {
+    // cover image
+    if (coverInput.files.length > 0) {
+      payload.cover_image = await uploadSingleImage(coverInput.files[0]);
+    } else if (!editIdVal) {
+      alert("Cover image required");
+      return;
+    }
+
+    // gallery images
+    if (galleryInput.files.length > 0) {
+      payload.images = await uploadGalleryImages(galleryInput.files);
+    }
+
+    let res;
+    if (editIdVal) {
+      res = await client
+        .from("products")
+        .update(payload)
+        .eq("id", editIdVal);
+    } else {
+      payload.available = true;
+      res = await client.from("products").insert(payload);
+    }
+
+    if (res.error) throw res.error;
+
+    alert("✅ Product saved");
+
+    document.querySelectorAll("input").forEach(i => i.value = "");
+    document.getElementById("editId").value = "";
+
+    loadProducts();
+
+  } catch (err) {
+    console.error("SAVE ERROR:", err);
+    alert(err.message);
+  }
+}
+
 /* ================= TOGGLE / DELETE ================= */
 async function toggleAvailability(id, state) {
   await client.from("products").update({ available: state }).eq("id", id);
@@ -176,3 +250,4 @@ async function removeProduct(id) {
 </script>
 </body>
 </html>
+
