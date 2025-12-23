@@ -9,248 +9,104 @@
 
 <style>
 :root {
-  --purple: #8e44ad;
-  --bg: #faf6fb;
-  --card: #ffffff;
-  --text: #222;
+  --purple:#8e44ad;
+  --bg:#faf6fb;
+}
+*{box-sizing:border-box;font-family:Arial;margin:0;padding:0}
+body{background:var(--bg)}
+
+.header{
+  height:60px;background:#fff;display:flex;align-items:center;
+  justify-content:space-between;padding:0 20px;
+}
+.logo{font-size:22px;font-weight:800}
+.logo span{color:var(--purple)}
+.hamburger{font-size:26px;cursor:pointer}
+
+.sidebar{
+  position:fixed;right:-260px;top:0;width:260px;height:100%;
+  background:#fff;padding:20px;transition:.3s;z-index:1001;
+}
+.sidebar.active{right:0}
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.4);
+  display:none;z-index:1000;
+}
+.overlay.active{display:block}
+
+.container{padding:30px}
+.top-bar{display:flex;justify-content:space-between;align-items:center}
+.add-btn{
+  background:var(--purple);color:#fff;border:none;
+  padding:12px 18px;border-radius:10px;cursor:pointer;
 }
 
-/* RESET */
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+.products{
+  margin-top:25px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:20px;
+}
+.card{
+  background:#fff;border-radius:14px;padding:12px;
+}
+.card img{width:100%;height:150px;object-fit:cover;border-radius:10px}
+.card h4{margin:8px 0}
+.actions{display:flex;gap:8px}
+.actions button{flex:1;padding:8px;border:none;border-radius:8px}
 
-body {
-  background: var(--bg);
-  color: var(--text);
+.modal{
+  position:fixed;inset:0;display:none;
+  align-items:center;justify-content:center;z-index:1002;
 }
-
-/* HEADER */
-.header {
-  height: 60px;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  justify-content: space-between;
-  box-shadow: 0 2px 10px rgba(0,0,0,.05);
+.modal.active{display:flex}
+.modal-box{
+  background:#fff;width:420px;
+  max-height:85vh;overflow-y:auto;
+  border-radius:16px;padding:20px;
 }
-
-.logo {
-  font-size: 22px;
-  font-weight: 800;
+.modal-box input{width:100%;padding:10px;margin-bottom:10px}
+.preview{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.preview div{position:relative}
+.preview img{width:70px;height:70px;object-fit:cover;border-radius:8px}
+.preview span{
+  position:absolute;top:-5px;right:-5px;
+  background:red;color:#fff;width:18px;height:18px;
+  border-radius:50%;font-size:12px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
 }
-.logo span { color: var(--purple); }
-
-/* HAMBURGER */
-.hamburger {
-  font-size: 26px;
-  cursor: pointer;
-}
-
-/* SIDEBAR */
-.sidebar {
-  position: fixed;
-  right: -260px;
-  top: 0;
-  width: 260px;
-  height: 100%;
-  background: #fff;
-  box-shadow: -5px 0 15px rgba(0,0,0,.1);
-  padding: 20px;
-  transition: .3s;
-  z-index: 1001;
-}
-.sidebar.active { right: 0; }
-
-.sidebar h3 { margin-bottom: 20px; }
-.sidebar button {
-  width: 100%;
-  padding: 12px;
-  background: #eee;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-/* OVERLAY */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.4);
-  display: none;
-  z-index: 1000;
-}
-.overlay.active { display: block; }
-
-/* MAIN */
-.container {
-  padding: 30px;
-}
-
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.add-btn {
-  background: var(--purple);
-  color: #fff;
-  border: none;
-  padding: 12px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 15px;
-}
-
-/* PRODUCTS */
-.products {
-  margin-top: 25px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
-  gap: 20px;
-}
-
-.card {
-  background: var(--card);
-  border-radius: 14px;
-  padding: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,.06);
-}
-
-.card img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-.card h4 { margin: 10px 0 5px; }
-.card p { font-size: 14px; }
-
-.card .actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
-.card button {
-  flex: 1;
-  padding: 8px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
-.edit { background: #eee; }
-.del { background: #ffdddd; }
-
-/* MODAL */
-.modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1002;
-}
-.modal.active { display: flex; }
-
-.modal-box {
-  background: #fff;
-  width: 420px;
-  max-height: 90vh;
-  border-radius: 16px;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.modal-box h3 {
-  margin-bottom: 15px;
-}
-
-.modal-box input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-}
-
-.modal-box label {
-  font-size: 14px;
-  margin-top: 10px;
-  display: block;
-}
-
-/* IMAGE PREVIEW */
-.preview {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 10px 0;
-}
-.preview div {
-  position: relative;
-}
-.preview img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-.preview span {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: red;
-  color: #fff;
-  font-size: 12px;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.save-btn {
-  background: var(--purple);
-  color: #fff;
-  border: none;
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  margin-top: 15px;
-  cursor: pointer;
+.save-btn{
+  background:var(--purple);color:#fff;
+  width:100%;padding:12px;border:none;border-radius:10px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div class="logo">TREN<span>DEALS</span></div>
   <div class="hamburger" onclick="toggleMenu()">☰</div>
 </div>
 
-<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
   <h3>Admin</h3>
+  <button onclick="toggleMenu()">Close</button><br><br>
   <button onclick="logout()">Logout</button>
 </div>
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
-<!-- MAIN -->
 <div class="container">
   <div class="top-bar">
     <h2>Products</h2>
     <button class="add-btn" onclick="openModal()">+ Add Product</button>
   </div>
-
   <div class="products" id="products"></div>
 </div>
 
-<!-- MODAL -->
-<div class="modal" id="modal">
-  <div class="modal-box">
+<div class="modal" id="modal" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
     <h3 id="modalTitle">Add Product</h3>
 
     <input id="name" placeholder="Product Name">
@@ -272,50 +128,42 @@ body {
 </div>
 
 <script>
-const SUPABASE_URL = "https://ctiglwnyimjzocvuizdq.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0aWdsd255aW1qem9jdnVpemRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDI4MTMsImV4cCI6MjA4MTYxODgxM30.eW5nl5yCXnz0V0iya6cZCMj4Pgy05vhClUQ4pLfwYNI";
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL="https://ctiglwnyimjzocvuizdq.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0aWdsd255aW1qem9jdnVpemRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNDI4MTMsImV4cCI6MjA4MTYxODgxM30.eW5nl5yCXnz0V0iya6cZCMj4Pgy05vhClUQ4pLfwYNI";
+const client=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let editId = null;
-let galleryFiles = [];
+let editId=null;
+let galleryFiles=[];
 
-/* MENU */
-function toggleMenu() {
+function toggleMenu(){
   sidebar.classList.toggle("active");
   overlay.classList.toggle("active");
 }
-
-/* MODAL */
-function openModal(edit=false) {
+function openModal(edit=false){
   modal.classList.add("active");
-  document.body.style.overflow = "hidden";
-  modalTitle.textContent = edit ? "Edit Product" : "Add Product";
+  modalTitle.textContent=edit?"Edit Product":"Add Product";
 }
-function closeModal() {
+function closeModal(e){
   modal.classList.remove("active");
-  document.body.style.overflow = "";
 }
 
-/* IMAGE PREVIEW */
-coverImage.onchange = () => {
-  coverPreview.innerHTML = "";
-  const img = document.createElement("img");
-  img.src = URL.createObjectURL(coverImage.files[0]);
+coverImage.onchange=()=>{
+  coverPreview.innerHTML="";
+  const img=document.createElement("img");
+  img.src=URL.createObjectURL(coverImage.files[0]);
   coverPreview.appendChild(img);
 };
 
-galleryImages.onchange = () => {
-  galleryPreview.innerHTML = "";
-  galleryFiles = [...galleryImages.files];
+galleryImages.onchange=()=>{
+  galleryFiles=[...galleryImages.files];
   renderGallery();
 };
-
-function renderGallery() {
-  galleryPreview.innerHTML = "";
+function renderGallery(){
+  galleryPreview.innerHTML="";
   galleryFiles.forEach((f,i)=>{
-    const div = document.createElement("div");
-    div.innerHTML = `<img src="${URL.createObjectURL(f)}"><span onclick="removeImg(${i})">×</span>`;
-    galleryPreview.appendChild(div);
+    galleryPreview.innerHTML+=`
+      <div><img src="${URL.createObjectURL(f)}">
+      <span onclick="removeImg(${i})">×</span></div>`;
   });
 }
 function removeImg(i){
@@ -323,103 +171,100 @@ function removeImg(i){
   renderGallery();
 }
 
-async function uploadToGitHub(file) {
-  const base64 = await new Promise(res => {
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(",")[1]);
+async function uploadToGitHub(file){
+  const base64=await new Promise(res=>{
+    const r=new FileReader();
+    r.onload=()=>res(r.result.split(",")[1]);
     r.readAsDataURL(file);
   });
-
-  const res = await fetch("/api/upload", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      fileName: `${Date.now()}-${file.name}`,
-      fileBase64: base64
-    })
+  const r=await fetch("/api/upload",{method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({fileName:Date.now()+"-"+file.name,fileBase64:base64})
   });
-
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error);
-  return data.url;
+  const d=await r.json(); if(!r.ok)throw d.error; return d.url;
 }
 
-  
-/* SAVE */
-async function saveProduct() {
-  const nameVal = name.value.trim();
-  const priceVal = price.value.trim();
-  const categoryVal = category.value.trim();
+async function saveProduct(){
+  const nameEl=document.getElementById("name");
+  const priceEl=document.getElementById("price");
+  const categoryEl=document.getElementById("category");
+  const sizesEl=document.getElementById("sizes");
+  const colorsEl=document.getElementById("colors");
 
-  if (!nameVal || !priceVal || !categoryVal) {
-    alert("Fill all required fields");
-    return;
-  }
-
-  const payload = {
-    name: nameVal,
-    price: Number(priceVal),
-    category: categoryVal,
-    sizes: sizes.value.split(",").map(s => s.trim()).filter(Boolean),
-    colors: colors.value.split(",").map(c => c.trim()).filter(Boolean),
+  const payload={
+    name:nameEl.value.trim(),
+    price:Number(priceEl.value),
+    category:categoryEl.value.trim(),
+    sizes:sizesEl.value.split(",").map(s=>s.trim()).filter(Boolean),
+    colors:colorsEl.value.split(",").map(c=>c.trim()).filter(Boolean),
   };
 
-  try {
-    /* COVER IMAGE */
-    if (coverImage.files.length) {
-      payload.cover_image = await uploadToGitHub(coverImage.files[0]);
-    }
+  if(!payload.name||!payload.price||!payload.category){
+    alert("Fill required fields");return;
+  }
 
-    /* GALLERY IMAGES */
-    if (galleryFiles.length) {
-      payload.images = [];
-      for (const file of galleryFiles) {
-        payload.images.push(await uploadToGitHub(file));
-      }
-    }
+  if(coverImage.files[0])
+    payload.cover_image=await uploadToGitHub(coverImage.files[0]);
 
-    let res;
-    if (editId) {
-      // UPDATE
-      res = await client
-        .from("products")
-        .update(payload)
-        .eq("id", editId);
-    } else {
-      // INSERT
-      payload.available = true;
-      payload.images ||= [];
-      res = await client.from("products").insert(payload);
-    }
+  if(galleryFiles.length){
+    payload.images=[];
+    for(const f of galleryFiles)
+      payload.images.push(await uploadToGitHub(f));
+  }
 
-    if (res.error) throw res.error;
+  if(editId)
+    await client.from("products").update(payload).eq("id",editId);
+  else{
+    payload.available=true;
+    payload.images ||= [];
+    await client.from("products").insert(payload);
+  }
 
-    /* RESET */
-    editId = null;
-    name.value = price.value = category.value = sizes.value = colors.value = "";
-    coverImage.value = "";
-    galleryImages.value = "";
-    galleryFiles = [];
-    coverPreview.innerHTML = "";
-    galleryPreview.innerHTML = "";
+  closeModal();
+  loadProducts();
+}
 
-    closeModal();
+async function loadProducts(){
+  const {data}=await client.from("products").select("*");
+  products.innerHTML="";
+  data.forEach(p=>{
+    products.innerHTML+=`
+    <div class="card">
+      <img src="${p.cover_image}">
+      <h4>${p.name}</h4>
+      <p>₹${p.price}</p>
+      <div class="actions">
+        <button onclick="editProduct('${p.id}')">Edit</button>
+        <button onclick="deleteProduct('${p.id}')">Delete</button>
+      </div>
+    </div>`;
+  });
+}
+
+async function editProduct(id){
+  const {data}=await client.from("products").select("*").eq("id",id).single();
+  editId=id;
+  name.value=data.name;
+  price.value=data.price;
+  category.value=data.category;
+  sizes.value=(data.sizes||[]).join(",");
+  colors.value=(data.colors||[]).join(",");
+  openModal(true);
+}
+
+async function deleteProduct(id){
+  if(confirm("Delete product?")){
+    await client.from("products").delete().eq("id",id);
     loadProducts();
-    alert("✅ Product saved successfully");
-
-  } catch (err) {
-    console.error("SAVE ERROR:", err);
-    alert(err.message);
   }
 }
 
-
-/* LOGOUT */
 async function logout(){
   await client.auth.signOut();
   location.reload();
 }
+
+loadProducts();
 </script>
 </body>
 </html>
-
