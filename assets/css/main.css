@@ -1468,4 +1468,40 @@ contact-item h4 {
   padding-top: 80px; /* creates gap below fixed topbar */
 }
 
+.admin-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.admin-modal.active {
+  display: flex;
+}
+
+.admin-modal-box {
+  position: relative;
+  background: #fff;
+  width: 420px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.admin-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #eee;
+  font-size: 22px;
+  cursor: pointer;
+}
 
