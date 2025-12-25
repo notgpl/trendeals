@@ -16,22 +16,38 @@ document.addEventListener("DOMContentLoaded", async () => {
   const grouped = {};
   data.forEach(p => (grouped[p.category] ||= []).push(p));
 
-  products.innerHTML += `
-  <div class="swiper-slide">
-    <div class="product-card" onclick="openProduct('${p.id}')">
+  products.innerHTML = "";
 
-      <div class="product-image">
-        <img src="${p.cover_image}" alt="${p.name}">
-        <span class="price-tag">₹${p.price}</span>
+  Object.keys(grouped).forEach(category => {
+    products.innerHTML += `
+      <h2>${category}</h2>
+
+      <div class="swiper productSwiper">
+        <div class="swiper-wrapper">
+          ${grouped[category].map(p => `
+            <div class="swiper-slide">
+              <div class="product-card" onclick="openProduct('${p.id}')">
+
+                <div class="product-image">
+                  <img src="${p.cover_image}" alt="${p.name}">
+                  <span class="price-tag">₹${p.price}</span>
+                </div>
+
+                <h4 class="product-title">${p.name}</h4>
+
+              </div>
+            </div>
+          `).join("")}
+        </div>
       </div>
+    `;
+  });
 
-      <h4 class="product-title">${p.name}</h4>
-
-    </div>
-  </div>`;
-
-
-  new Swiper(".productSwiper", { slidesPerView: 1.3, breakpoints: { 768:{slidesPerView:3} }});
+  // 🔥 INIT SWIPER AFTER DOM IS READY
+  document.querySelectorAll(".productSwiper").forEach(swiper => {
+    new Swiper(swiper, {
+      slidesPerView: "auto",
+      spaceBetween: 16,
+    });
+  });
 });
-
-
