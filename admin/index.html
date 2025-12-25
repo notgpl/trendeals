@@ -327,7 +327,7 @@ body{
 
 <!-- ================= MODAL ================= -->
 
-<div class="modal" id="modal" onclick="closeModal(event)">
+<div class="modal" id="modal">
   <div class="modal-box" onclick="event.stopPropagation()">
 
     <div class="modal-header">
@@ -366,11 +366,14 @@ function toggleMenu(){
 
 function openModal(edit=false){
   modal.classList.add("active");
+  document.body.style.overflow = "hidden";
   modalTitle.textContent = edit ? "Edit Product" : "Add Product";
 }
 
 function closeModal(){
   modal.classList.remove("active");
+  document.body.style.overflow = "";
+  editId = null;
 }
 
 coverImage.onchange=()=>{
@@ -520,4 +523,5 @@ loadProducts();
 
 </body>
 </html>
+
 
