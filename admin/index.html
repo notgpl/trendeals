@@ -422,33 +422,51 @@ async function uploadToGitHub(file){
   return d.url;
 }
 
-async function saveProduct(){
-  const payload={
-    name:name.value.trim(),
-    price:Number(price.value),
-    category:category.value.trim(),
-    sizes:sizes.value.split(",").map(s=>s.trim()).filter(Boolean),
-    colors:colors.value.split(",").map(c=>c.trim()).filter(Boolean)
+async function saveProduct() {
+  const nameEl = document.getElementById("name");
+  const priceEl = document.getElementById("price");
+  const categoryEl = document.getElementById("category");
+  const sizesEl = document.getElementById("sizes");
+  const colorsEl = document.getElementById("colors");
+
+  // 🛡️ SAFETY CHECK
+  if (!nameEl || !priceEl || !categoryEl) {
+    alert("Form error: missing fields");
+    return;
+  }
+
+  const payload = {
+    name: nameEl.value?.trim() || "",
+    price: Number(priceEl.value),
+    category: categoryEl.value?.trim() || "",
+    sizes: sizesEl?.value
+      ? sizesEl.value.split(",").map(s => s.trim()).filter(Boolean)
+      : [],
+    colors: colorsEl?.value
+      ? colorsEl.value.split(",").map(c => c.trim()).filter(Boolean)
+      : [],
   };
 
-  if(!payload.name || !payload.price || !payload.category){
+  if (!payload.name || !payload.price || !payload.category) {
     alert("Fill required fields");
     return;
   }
 
-  if(coverImage.files[0])
-    payload.cover_image=await uploadToGitHub(coverImage.files[0]);
-
-  if(galleryFiles.length){
-    payload.images=[];
-    for(const f of galleryFiles)
-      payload.images.push(await uploadToGitHub(f));
+  if (coverImage.files[0]) {
+    payload.cover_image = await uploadToGitHub(coverImage.files[0]);
   }
 
-  if(editId)
-    await client.from("products").update(payload).eq("id",editId);
-  else{
-    payload.available=true;
+  if (galleryFiles.length) {
+    payload.images = [];
+    for (const f of galleryFiles) {
+      payload.images.push(await uploadToGitHub(f));
+    }
+  }
+
+  if (editId) {
+    await client.from("products").update(payload).eq("id", editId);
+  } else {
+    payload.available = true;
     payload.images ||= [];
     await client.from("products").insert(payload);
   }
@@ -502,3 +520,4 @@ loadProducts();
 
 </body>
 </html>
+
