@@ -1034,16 +1034,12 @@ contact-item h4 {
 /* ================= PRODUCT CARD (FIXED) ================= */
 
 .product-card {
-  width: 260px;          /* card width */
-  height: 380px;         /* card height (important) */
+  width: 240px;          /* 👈 reduced width */
   background: #fff;
   border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-  cursor: pointer;
 }
-
-
 .product-card:hover {
   transform: translateY(-5px);
 }
