@@ -1034,14 +1034,15 @@ contact-item h4 {
 /* ================= PRODUCT CARD (FIXED) ================= */
 
 .product-card {
+  width: 260px;          /* card width */
+  height: 380px;         /* card height (important) */
   background: #fff;
-  border-radius: 14px;
-  text-align: center;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-
-  width: 220px;      /* slim card */
-  padding: 12px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  cursor: pointer;
 }
+
 
 .product-card:hover {
   transform: translateY(-5px);
@@ -1051,9 +1052,10 @@ contact-item h4 {
 
 .product-card img {
   width: 100%;
-  height: 260px;        /* controls image size */
-  object-fit: cover;   /* 🔥 THIS IS THE KEY */
-  border-radius: 10px;
+  height: 100%;
+  object-fit: cover;   /* 🔥 fills like Max Fashion */
+  object-position: center;
+  display: block;
 }
 
 
