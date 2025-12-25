@@ -28,31 +28,36 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // RENDER EACH CATEGORY
-  Object.keys(grouped).forEach(category => {
-    container.innerHTML += `
+ Object.keys(grouped).forEach(category => {
+  container.innerHTML += `
+    <div class="category-header">
       <h2 class="category-title">${category}</h2>
+      <a class="view-more" href="category.html?name=${encodeURIComponent(category)}">
+        View More →
+      </a>
+    </div>
 
-      <div class="swiper productSwiper">
-        <div class="swiper-wrapper">
-          ${grouped[category]
-            .map(
-              p => `
-            <div class="swiper-slide">
-              <div class="product-card" onclick="openProduct('${p.id}')">
-                <div class="product-image">
-                  <img src="${p.cover_image}" alt="${p.name}">
-                  <span class="price-tag">₹${p.price}</span>
-                </div>
-                <h4 class="product-title">${p.name}</h4>
+    <div class="swiper productSwiper">
+      <div class="swiper-wrapper">
+        ${grouped[category].map(p => `
+          <div class="swiper-slide">
+            <div class="product-card" onclick="openProduct('${p.id}')">
+
+              <div class="product-image">
+                <img src="${p.cover_image}" alt="${p.name}">
+                <span class="price-tag">₹${p.price}</span>
               </div>
+
+              <h4 class="product-title">${p.name}</h4>
+
             </div>
-          `
-            )
-            .join("")}
-        </div>
+          </div>
+        `).join("")}
       </div>
-    `;
-  });
+    </div>
+  `;
+});
+
 
   // INIT SWIPERS
   document.querySelectorAll(".productSwiper").forEach(swiperEl => {
@@ -68,3 +73,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 }); // ✅ THIS WAS MISSING
+
