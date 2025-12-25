@@ -1039,6 +1039,7 @@ contact-item h4 {
   border-radius: 18px;
   box-shadow: 0 8px 25px rgba(0,0,0,0.08);
   overflow: hidden;
+  text-align: center;
 }
 .product-card:hover {
   transform: translateY(-5px);
@@ -1067,6 +1068,7 @@ contact-item h4 {
   font-size: 15px;
   font-weight: 600;
   margin: 10px 0 4px;
+  text-align: center;
 }
 
 .product-card p {
