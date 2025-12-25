@@ -1039,9 +1039,10 @@ contact-item h4 {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease;
   padding: 1px;
-  width: 160px;        
+  width: 60%;
+  max-width: 260px;
+  height: 290px;       
   margin: auto; 
-  
 }
 
 .product-card:hover {
@@ -1053,7 +1054,6 @@ contact-item h4 {
   max-width: 260px;
   height: 290px;
   object-fit: cover;
-  padding: 12px;
 }
 
 /* Product text */
