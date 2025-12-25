@@ -1028,8 +1028,9 @@ contact-item h4 {
 /* Swiper container */
 .productSwiper {
   padding-bottom: 10px;
+  display: flex;
+  justify-content: center;
 }
-
 /* ================= PRODUCT CARD (FIXED) ================= */
 
 .product-card {
@@ -1039,9 +1040,9 @@ contact-item h4 {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease;
 
-  width: 240px;          /* controls card size */
+  width: 210px;          /* 🔽 reduced */
   padding: 12px;
-  margin: auto;
+  margin: 0;
 }
 
 .product-card:hover {
