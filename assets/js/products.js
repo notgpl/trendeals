@@ -53,14 +53,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
   });
 
-  // 🔥 INIT SWIPER AFTER HTML IS READY
-  document.querySelectorAll(".productSwiper").forEach(swiper => {
-    new Swiper(swiper, {
-      slidesPerView: 1.3,
-      spaceBetween: 16,
-      breakpoints: {
-        768: { slidesPerView: 3 }
+ document.querySelectorAll(".productSwiper").forEach(swiperEl => {
+  new Swiper(swiperEl, {
+    slidesPerView: "auto",   // 🔥 KEY FIX
+    spaceBetween: 16,
+    freeMode: true,          // smooth scroll like Amazon
+    breakpoints: {
+      768: {
+        spaceBetween: 24
       }
-    });
+    }
   });
 });
+
+
