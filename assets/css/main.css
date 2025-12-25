@@ -1038,6 +1038,10 @@ contact-item h4 {
   text-align: center;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease;
+  padding: 14px;
+  width: 240px;        
+  padding: 14px;
+  margin: auto; 
   
 }
 
