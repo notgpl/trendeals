@@ -29,9 +29,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     </div>
   </div>`;
-  });
 
 
   new Swiper(".productSwiper", { slidesPerView: 1.3, breakpoints: { 768:{slidesPerView:3} }});
 });
+
 
