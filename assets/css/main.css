@@ -1172,9 +1172,11 @@ contact-item h4 {
 }
 
 .product-page .main-image {
-  width: 60%;
-  max-width: 400px;
+  width: 100%;
+  max-width: 320px;   
   border-radius: 14px;
+  display: block;
+  margin: 0 auto;     
 }
 
 .product-page .thumbs {
@@ -1343,6 +1345,7 @@ contact-item h4 {
 
 .gallery {
   position: relative;
+  padding-top: 70px;
 }
 
 .product-topbar {
