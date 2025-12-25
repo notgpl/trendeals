@@ -1047,8 +1047,9 @@ contact-item h4 {
 
 .product-card img {
   width: 100%;
-  height: 260px;
+  height: 200px;
   object-fit: cover;
+  padding: 12px;
 }
 
 /* Product text */
