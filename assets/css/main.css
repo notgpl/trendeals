@@ -727,35 +727,26 @@ section,
   font-size: 1.25rem;
 }
 
-.hero .btn-primary {
-  background-color: var(--accent-color);
+/* ================= HERO SEARCH ================= */
+
+.hero-search {
+  width: 100%;
+  max-width: 420px;
+  padding: 14px 18px;
+  border-radius: 30px;
+  border: 2px solid color-mix(in srgb, var(--accent-color), transparent 70%);
+  font-size: 16px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.hero-search::placeholder {
+  color: #999;
+}
+
+.hero-search:focus {
   border-color: var(--accent-color);
-  color: var(--contrast-color);
-  padding: 0.60rem 2.3rem;
-  border-radius: 0px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.hero .btn-primary:hover {
-  background-color: color-mix(in srgb, var(--accent-color), black 20%);
-  border-color: color-mix(in srgb, var(--accent-color), black 20%);
-}
-
-.hero .btn-link {
-  color: var(--heading-color);
-  text-decoration: none;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.hero .btn-link:hover {
-  color: var(--accent-color);
-}
-
-.hero .btn-link i {
-  font-size: 1.5rem;
-  vertical-align: middle;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-color), transparent 85%);
 }
 
 .hero .hero-image {
