@@ -1032,6 +1032,10 @@ contact-item h4 {
 .swiper-slide {
   width: auto;       /* 🔥 critical */
 }
+.swiper-slide {
+  width: auto;
+}
+
 
 /* ================= PRODUCT CARD (FIXED) ================= */
 
