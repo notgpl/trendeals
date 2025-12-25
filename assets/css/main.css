@@ -1175,8 +1175,7 @@ contact-item h4 {
   width: 100%;
   max-width: 320px;   
   border-radius: 14px;
-  display: block;
-  margin: 0 auto;     
+  display: block;    
 }
 
 .product-page .thumbs {
