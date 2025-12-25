@@ -1030,48 +1030,52 @@ contact-item h4 {
   padding-bottom: 10px;
 }
 
-/* Product card */
+/* ================= PRODUCT CARD (FINAL) ================= */
+
 .product-card {
   background: #fff;
   border-radius: 14px;
-  overflow: hidden;
   text-align: center;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease;
-  padding: 1px;
-  width: 60%;
-  max-width: 260px;
-  height: 290px;       
-  margin: auto; 
+
+  width: 240px;          /* ✅ SAME FOR ALL */
+  height: 330px;         /* ✅ SAME FOR ALL */
+  padding: 14px;
+  margin: auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .product-card:hover {
   transform: translateY(-5px);
 }
 
+/* ================= PRODUCT IMAGE ================= */
+
 .product-card img {
-  width: 60%;
-  max-width: 260px;
-  height: 290px;
-  object-fit: cover;
+  width: 100%;           /* ❌ no 60% */
+  height: 190px;         /* ✅ controls image size */
+  object-fit: contain;   /* ✅ no crop */
+  background: #f6f6f6;
+  border-radius: 10px;
+  padding: 10px;
 }
 
-/* Product text */
+/* ================= PRODUCT TEXT ================= */
+
 .product-card h4 {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  margin: 10px 0 4px;
+  margin: 12px 0 4px;
 }
 
 .product-card p {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
-  margin-bottom: 12px;
-}
-
-/* Image wrapper */
-.product-image {
-  position: relative;
+  margin-bottom: 0;
 }
 
 /* Price tag (Top Right) */
