@@ -16,21 +16,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   const grouped = {};
   data.forEach(p => (grouped[p.category] ||= []).push(p));
 
-  products.innerHTML = "";
-  Object.keys(grouped).forEach(cat => {
-    products.innerHTML += `
-      <h2>${cat}</h2>
-      <div class="swiper productSwiper">
-        <div class="swiper-wrapper">
-          ${grouped[cat].map(p => `
-            <div class="swiper-slide product-card" onclick="openProduct('${p.id}')">
-              <img src="${p.cover_image}">
-              <div class="price-tag">₹${p.price}</div>
-              <h4>${p.name}</h4>
-            </div>`).join("")}
-        </div>
-      </div>`;
+  products.innerHTML += `
+  <div class="swiper-slide">
+    <div class="product-card" onclick="openProduct('${p.id}')">
+
+      <div class="product-image">
+        <img src="${p.cover_image}" alt="${p.name}">
+        <span class="price-tag">₹${p.price}</span>
+      </div>
+
+      <h4 class="product-title">${p.name}</h4>
+
+    </div>
+  </div>`;
   });
+
 
   new Swiper(".productSwiper", { slidesPerView: 1.3, breakpoints: { 768:{slidesPerView:3} }});
 });
+
