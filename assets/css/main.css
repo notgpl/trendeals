@@ -1028,8 +1028,6 @@ contact-item h4 {
 /* Swiper container */
 .productSwiper {
   padding-bottom: 10px;
-  display: flex;
-  justify-content: center;
 }
 /* ================= PRODUCT CARD (FIXED) ================= */
 
