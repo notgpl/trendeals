@@ -1046,11 +1046,17 @@ contact-item h4 {
 
 /* ================= PRODUCT IMAGE ================= */
 
-.product-card img {
+.product-image {
+  position: relative;
+  width: 100%;
+  height: 280px;          /* 👈 controls image size */
+  overflow: hidden;
+}
+
+.product-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;   /* 🔥 fills like Max Fashion */
-  object-position: center;
+  object-fit: cover;     /* 🔥 fills nicely */
   display: block;
 }
 
