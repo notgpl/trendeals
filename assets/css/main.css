@@ -1046,10 +1046,9 @@ contact-item h4 {
 }
 
 .product-card img {
-  width: 60%;
-  height: 240px;                   
-  background: #f6f6f6;       
-  padding: 10px;              
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
 }
 
 /* Product text */
