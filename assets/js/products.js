@@ -5,27 +5,39 @@ window.openProduct = id => {
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const { data } = await client
+  const { data, error } = await client
     .from("products")
     .select("*")
     .eq("available", true)
     .order("created_at", { ascending: false });
 
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const container = document.getElementById("products");
+  container.innerHTML = "";
+
   const grouped = {};
-  data.forEach(p => (grouped[p.category] ||= []).push(p));
 
-  products.innerHTML = "";
+  // GROUP PRODUCTS BY CATEGORY
+  data.forEach(p => {
+    if (!grouped[p.category]) grouped[p.category] = [];
+    grouped[p.category].push(p);
+  });
 
+  // RENDER EACH CATEGORY
   Object.keys(grouped).forEach(category => {
-    products.innerHTML += `
-      <h2>${category}</h2>
+    container.innerHTML += `
+      <h2 class="category-title">${category}</h2>
 
       <div class="swiper productSwiper">
         <div class="swiper-wrapper">
           ${grouped[category].map(p => `
             <div class="swiper-slide">
               <div class="product-card" onclick="openProduct('${p.id}')">
-
+                
                 <div class="product-image">
                   <img src="${p.cover_image}" alt="${p.name}">
                   <span class="price-tag">₹${p.price}</span>
@@ -41,12 +53,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
   });
 
-  // 🔥 INIT SWIPER AFTER DOM IS READY
+  // 🔥 INIT SWIPER AFTER HTML IS READY
   document.querySelectorAll(".productSwiper").forEach(swiper => {
     new Swiper(swiper, {
-      slidesPerView: "auto",
+      slidesPerView: 1.3,
       spaceBetween: 16,
+      breakpoints: {
+        768: { slidesPerView: 3 }
+      }
     });
   });
 });
-
