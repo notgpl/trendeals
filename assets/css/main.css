@@ -727,12 +727,27 @@ section,
   font-size: 1.25rem;
 }
 
-/* ================= HERO SEARCH ================= */
+/* ================= HERO SEARCH WITH ICON ================= */
+
+.hero-search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+}
+
+.hero-search-wrapper i {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: #999;
+  pointer-events: none;
+}
 
 .hero-search {
   width: 100%;
-  max-width: 420px;
-  padding: 14px 18px;
+  padding: 14px 18px 14px 44px; /* 👈 space for icon */
   border-radius: 30px;
   border: 2px solid color-mix(in srgb, var(--accent-color), transparent 70%);
   font-size: 16px;
@@ -740,14 +755,15 @@ section,
   transition: 0.3s;
 }
 
-.hero-search::placeholder {
-  color: #999;
-}
-
 .hero-search:focus {
   border-color: var(--accent-color);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-color), transparent 85%);
 }
+
+.hero-search::placeholder {
+  color: #999;
+}
+
 
 .hero .hero-image {
   position: relative;
