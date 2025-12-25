@@ -1464,4 +1464,8 @@ contact-item h4 {
   font-weight: 700;
 }
 
+.category-page {
+  padding-top: 80px; /* creates gap below fixed topbar */
+}
+
 
