@@ -38,3 +38,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
   });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const category = params.get("name");
+
+  if (!category) {
+    document.getElementById("categoryName").textContent = "Products";
+    return;
+  }
+
+  document.getElementById("categoryName").textContent = category;
+});
