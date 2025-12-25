@@ -1378,3 +1378,26 @@ contact-item h4 {
     font-size: 13px;
   }
 }
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 5px 10px;
+}
+
+.category-title {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.view-more {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.view-more:hover {
+  text-decoration: underline;
+}
+
