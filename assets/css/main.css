@@ -1035,8 +1035,10 @@ contact-item h4 {
 
 /* ================= PRODUCT CARD (FIXED) ================= */
 
+
 .product-card {
-  width: 240px;          /* 👈 reduced width */
+  width: 100%;
+  max-width: 240px;
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 8px 25px rgba(0,0,0,0.08);
