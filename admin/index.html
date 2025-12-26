@@ -541,8 +541,8 @@ async function deleteProduct(id){
 }
 
 async function logout(){
-  await client.auth.signOut();
-  location.reload();
+  await supabaseClient.auth.signOut();
+  window.location.href = "/admin/login.html";
 }
 
 loadProducts();
@@ -557,6 +557,7 @@ document.getElementById("modal").addEventListener("click", e => {
 
 </body>
 </html>
+
 
 
 
