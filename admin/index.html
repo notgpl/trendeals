@@ -199,6 +199,7 @@ body{
   overflow-y:auto;
   border-radius:18px;
   padding:24px;
+  touch-action: manipulation;
   animation:scaleIn .25s ease;
 }
 
@@ -537,10 +538,18 @@ async function logout(){
 }
 
 loadProducts();
+
+document.getElementById("modal").addEventListener("click", e => {
+  if (e.target.id === "modal") {
+    closeModal();
+  }
+});
+
 </script>
 
 </body>
 </html>
+
 
 
 
