@@ -521,6 +521,11 @@ async function loadProducts() {
   }
 }
 
+const loginBox = document.getElementById("adminLogin");
+const adminUI = document.getElementById("adminApp");
+
+if (loginBox) loginBox.style.display = "none";
+if (adminUI) adminUI.style.display = "block";
 
 async function editProduct(id){
   const {data}=await client.from("products").select("*").eq("id",id).single();
@@ -627,6 +632,7 @@ async function checkAdminSession() {
 
 </body>
 </html>
+
 
 
 
