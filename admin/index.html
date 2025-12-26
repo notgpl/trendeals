@@ -354,10 +354,7 @@ body{
     <input type="file" id="galleryImages" multiple>
     <div class="preview" id="galleryPreview"></div>
 
-    <button
-  type="button"
-  class="save-btn"
-  onclick="event.stopPropagation(); saveProduct();">
+   <button type="button" class="save-btn" onclick="saveProduct()">
   Save Product
 </button>
 
@@ -385,6 +382,9 @@ function closeModal(){
   modal.classList.remove("active");
   document.body.style.overflow = "";
   editId = null;
+  galleryFiles = [];
+  coverPreview.innerHTML = "";
+  galleryPreview.innerHTML = "";
 }
 
 coverImage.onchange=()=>{
@@ -461,9 +461,9 @@ async function saveProduct() {
       return;
     }
 
-    if (coverImage.files[0]) {
-      payload.cover_image = await uploadToGitHub(coverImage.files[0]);
-    }
+    if (coverImage.files && coverImage.files.length > 0) {
+  payload.cover_image = await uploadToGitHub(coverImage.files[0]);
+}
 
     if (galleryFiles.length) {
       payload.images = [];
@@ -480,9 +480,8 @@ async function saveProduct() {
       await client.from("products").insert(payload);
     }
 
-    closeModal();
     await loadProducts();
-    setTimeout(closeModal, 200);
+    closeModal();
 
 
   } catch (err) {
@@ -558,6 +557,7 @@ document.getElementById("modal").addEventListener("click", e => {
 
 </body>
 </html>
+
 
 
 
