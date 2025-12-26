@@ -187,9 +187,13 @@ body{
   background:rgba(0,0,0,.45);
   backdrop-filter:blur(3px);
   z-index:1002;
+  pointer-events: auto;
 }
 
-.modal.active{display:flex}
+.modal.active{
+  display: flex;
+  pointer-events: auto;
+}
 
 .modal-box{
   background:#fff;
@@ -350,7 +354,10 @@ body{
     <input type="file" id="galleryImages" multiple>
     <div class="preview" id="galleryPreview"></div>
 
-    <button type="button" class="save-btn" onclick="saveProduct()">
+    <button
+  type="button"
+  class="save-btn"
+  onclick="event.stopPropagation(); saveProduct();">
   Save Product
 </button>
 
@@ -474,7 +481,9 @@ async function saveProduct() {
     }
 
     closeModal();
-    await loadProducts();   // 👈 IMPORTANT: await
+    await loadProducts();
+    setTimeout(closeModal, 200);
+
 
   } catch (err) {
     console.error("Save failed:", err);
@@ -549,6 +558,7 @@ document.getElementById("modal").addEventListener("click", e => {
 
 </body>
 </html>
+
 
 
 
