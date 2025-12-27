@@ -158,50 +158,105 @@ function openModal(){ modal.classList.add("active"); }
 function closeModal(){ modal.classList.remove("active"); }
 
 async function loadProducts(){
-  const { data } = await client.from("products").select("*").order("created_at",{ascending:false});
-  products.innerHTML="";
-  data?.forEach(p=>{
-    products.innerHTML+=`
+  const { data } = await client
+    .from("products")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  products.innerHTML = "";
+
+  data?.forEach(p => {
+    products.innerHTML += `
       <div class="card">
-        <img src="${p.cover_image||""}">
+        <img src="${p.cover_image || ""}">
         <h4>${p.name}</h4>
         <p>₹${p.price}</p>
-      </div>`;
+
+        <div class="actions">
+          <button onclick="editProduct('${p.id}')">Edit</button>
+          <button onclick="deleteProduct('${p.id}')">Delete</button>
+          <button onclick="toggleAvailable('${p.id}', ${p.available})">
+            ${p.available ? "Disable" : "Enable"}
+          </button>
+        </div>
+      </div>
+    `;
   });
 }
 
+  async function deleteProduct(id){
+  if (!confirm("Delete product?")) return;
+  await client.from("products").delete().eq("id", id);
+  loadProducts();
+}
+
+async function toggleAvailable(id, current){
+  await client
+    .from("products")
+    .update({ available: !current })
+    .eq("id", id);
+  loadProducts();
+}
+
+
+async function uploadToGitHub(file) {
+  const base64 = await new Promise(res => {
+    const reader = new FileReader();
+    reader.onload = () => res(reader.result.split(",")[1]);
+    reader.readAsDataURL(file);
+  });
+
+  const res = await fetch("/api/upload", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fileName: Date.now() + "-" + file.name,
+      fileBase64: base64
+    })
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw data.error;
+  return data.url;
+}
+  
 async function saveProduct() {
   try {
-    const nameInput = document.getElementById("name");
-    const priceInput = document.getElementById("price");
-    const categoryInput = document.getElementById("category");
-    const sizesInput = document.getElementById("sizes");
-    const colorsInput = document.getElementById("colors");
+    const nameValue = name.value.trim();
+    const categoryValue = category.value.trim();
+    const priceValue = price.value.trim();
 
-    const nameValue = nameInput.value.trim();
-    const categoryValue = categoryInput.value.trim();
-    const priceValue = priceInput.value.trim();
-
-    const payload = {
-  name: nameValue,
-  category: categoryValue,
-  price: Number(priceValue),
-  sizes: sizesInput.value
-    ? sizesInput.value.split(",").map(s => s.trim()).filter(Boolean)
-    : [],
-  colors: colorsInput.value
-    ? colorsInput.value.split(",").map(c => c.trim()).filter(Boolean)
-    : [],
-  images: [],        // ✅ THIS LINE FIXES EVERYTHING
-  available: true
-};
-
-
-    // ✅ REAL validation
-    if (!payload.name || !payload.category || payload.price === null || payload.price <= 0) {
+    if (!nameValue || !categoryValue || priceValue === "" || Number(priceValue) <= 0) {
       alert("Fill required fields");
       return;
     }
+
+    let coverUrl = null;
+    let galleryUrls = [];
+
+    // ✅ upload cover image
+    if (coverImage.files.length > 0) {
+      coverUrl = await uploadToGitHub(coverImage.files[0]);
+    }
+
+    // ✅ upload gallery images
+    if (galleryImages.files.length > 0) {
+      for (const file of galleryImages.files) {
+        const url = await uploadToGitHub(file);
+        galleryUrls.push(url);
+      }
+    }
+
+    const payload = {
+      name: nameValue,
+      category: categoryValue,
+      price: Number(priceValue),
+      sizes: sizes.value ? sizes.value.split(",").map(s => s.trim()) : [],
+      colors: colors.value ? colors.value.split(",").map(c => c.trim()) : [],
+      cover_image: coverUrl,
+      images: galleryUrls,   // 🔥 THIS FIXES THE BLANK IMAGES
+      available: true
+    };
 
     const { error } = await client.from("products").insert(payload);
     if (error) throw error;
@@ -210,8 +265,8 @@ async function saveProduct() {
     loadProducts();
 
   } catch (err) {
-    console.error("Save failed:", err);
-    alert("Failed to save product");
+    console.error(err);
+    alert("Image upload or save failed");
   }
 }
 
@@ -223,6 +278,7 @@ async function saveProduct() {
 
 </body>
 </html>
+
 
 
 
