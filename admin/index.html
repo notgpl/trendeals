@@ -222,39 +222,49 @@ async function uploadToGitHub(file) {
   
 async function saveProduct() {
   try {
-    const nameValue = name.value.trim();
-    const categoryValue = category.value.trim();
-    const priceValue = price.value.trim();
+    // ✅ EXPLICIT INPUT REFERENCES (THIS FIXES THE ERROR)
+    const nameInput = document.getElementById("name");
+    const priceInput = document.getElementById("price");
+    const categoryInput = document.getElementById("category");
+    const sizesInput = document.getElementById("sizes");
+    const colorsInput = document.getElementById("colors");
 
+    const nameValue = nameInput.value.trim();
+    const categoryValue = categoryInput.value.trim();
+    const priceValue = priceInput.value.trim();
+
+    // ✅ VALIDATION
     if (!nameValue || !categoryValue || priceValue === "" || Number(priceValue) <= 0) {
       alert("Fill required fields");
       return;
     }
 
+    // ✅ IMAGE UPLOAD
     let coverUrl = null;
     let galleryUrls = [];
 
-    // ✅ upload cover image
     if (coverImage.files.length > 0) {
       coverUrl = await uploadToGitHub(coverImage.files[0]);
     }
 
-    // ✅ upload gallery images
     if (galleryImages.files.length > 0) {
       for (const file of galleryImages.files) {
-        const url = await uploadToGitHub(file);
-        galleryUrls.push(url);
+        galleryUrls.push(await uploadToGitHub(file));
       }
     }
 
     const payload = {
       name: nameValue,
-      category: categoryValue,
       price: Number(priceValue),
-      sizes: sizes.value ? sizes.value.split(",").map(s => s.trim()) : [],
-      colors: colors.value ? colors.value.split(",").map(c => c.trim()) : [],
+      category: categoryValue,
+      sizes: sizesInput.value
+        ? sizesInput.value.split(",").map(s => s.trim())
+        : [],
+      colors: colorsInput.value
+        ? colorsInput.value.split(",").map(c => c.trim())
+        : [],
       cover_image: coverUrl,
-      images: galleryUrls,   // 🔥 THIS FIXES THE BLANK IMAGES
+      images: galleryUrls,   // ⚠️ REQUIRED (NOT NULL)
       available: true
     };
 
@@ -265,10 +275,11 @@ async function saveProduct() {
     loadProducts();
 
   } catch (err) {
-    console.error(err);
-    alert("Image upload or save failed");
+    console.error("Save failed:", err);
+    alert("Save failed — check console");
   }
 }
+
 
 
 
@@ -278,6 +289,7 @@ async function saveProduct() {
 
 </body>
 </html>
+
 
 
 
