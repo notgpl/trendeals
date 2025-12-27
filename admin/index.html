@@ -186,13 +186,21 @@ async function loadProducts(){
   loadProducts();
 }
 
-async function toggleAvailable(id, current){
-  await client
+async function toggleAvailable(id, current) {
+  const { error } = await client
     .from("products")
     .update({ available: !current })
     .eq("id", id);
+
+  if (error) {
+    console.error("Toggle failed:", error);
+    alert("Failed to update status");
+    return;
+  }
+
   loadProducts();
 }
+
 
 
 async function uploadToGitHub(file) {
@@ -322,6 +330,7 @@ function editProduct(product) {
 
 </body>
 </html>
+
 
 
 
