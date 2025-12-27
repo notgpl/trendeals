@@ -166,21 +166,17 @@ async function loadProducts(){
   products.innerHTML = "";
 
   data?.forEach(p => {
-    products.innerHTML += `
-      <div class="card">
-        <img src="${p.cover_image || ""}">
-        <h4>${p.name}</h4>
-        <p>₹${p.price}</p>
-
-        <div class="actions">
-          <button onclick="editProduct('${p.id}')">Edit</button>
-          <button onclick="deleteProduct('${p.id}')">Delete</button>
-          <button onclick="toggleAvailable('${p.id}', ${p.available})">
-            ${p.available ? "Disable" : "Enable"}
-          </button>
-        </div>
-      </div>
-    `;
+  products.innerHTML += `
+  <div class="card">
+    <img src="${p.cover_image || ""}">
+    <h4>${p.name}</h4>
+    <p>₹${p.price}</p>
+    <div class="actions">
+      <button onclick='editProduct(${JSON.stringify(p)})'>Edit</button>
+      <button onclick="deleteProduct('${p.id}')">Delete</button>
+    </div>
+  </div>
+`;
   });
 }
 
@@ -268,8 +264,22 @@ async function saveProduct() {
       available: true
     };
 
-    const { error } = await client.from("products").insert(payload);
-    if (error) throw error;
+    let error;
+
+if (editId) {
+  ({ error } = await client
+    .from("products")
+    .update(payload)
+    .eq("id", editId));
+  editId = null;
+} else {
+  ({ error } = await client
+    .from("products")
+    .insert(payload));
+}
+
+if (error) throw error;
+
 
     closeModal();
     loadProducts();
@@ -280,12 +290,6 @@ async function saveProduct() {
   }
 }
 
-  if (editId) {
-  await client.from("products").update(payload).eq("id", editId);
-  editId = null;
-} else {
-  await client.from("products").insert(payload);
-}
 
 let editId = null;
 
@@ -318,6 +322,7 @@ function editProduct(product) {
 
 </body>
 </html>
+
 
 
 
