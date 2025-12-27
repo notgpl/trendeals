@@ -280,6 +280,28 @@ async function saveProduct() {
   }
 }
 
+let editId = null;
+
+function editProduct(product) {
+  editId = product.id;
+
+  document.getElementById("name").value = product.name || "";
+  document.getElementById("price").value = product.price || "";
+  document.getElementById("category").value = product.category || "";
+  document.getElementById("sizes").value = (product.sizes || []).join(",");
+  document.getElementById("colors").value = (product.colors || []).join(",");
+
+  // previews
+  document.getElementById("coverPreview").innerHTML = product.cover_image
+    ? `<img src="${product.cover_image}">`
+    : "";
+
+  document.getElementById("galleryPreview").innerHTML = (product.images || [])
+    .map(img => `<img src="${img}">`)
+    .join("");
+
+  openModal();
+}
 
 
 
@@ -289,6 +311,7 @@ async function saveProduct() {
 
 </body>
 </html>
+
 
 
 
