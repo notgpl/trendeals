@@ -186,9 +186,10 @@ async function saveProduct() {
     };
 
     if (
-  !payload.name ||
+  payload.name === "" ||
   payload.category === "" ||
-  Number.isNaN(payload.price)
+  isNaN(payload.price) ||
+  payload.price <= 0
 ) {
   alert("Fill required fields");
   return;
@@ -216,6 +217,7 @@ async function saveProduct() {
 
 </body>
 </html>
+
 
 
 
