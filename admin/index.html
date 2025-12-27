@@ -108,7 +108,8 @@ body{ background:var(--bg); }
 
 <div class="modal" id="modal">
   <div class="modal-box">
-    <input id="name" placeholder="Product Name"> <input id="price" placeholder="Price"> <input id="category" placeholder="Category"> <input id="sizes" placeholder="Sizes (S,M,L)"> <input id="colors" placeholder="Colors (Red,Blue)"> <label>Cover Image</label> <input type="file" id="coverImage"> <div class="preview" id="coverPreview"></div> <label>Gallery Images</label> <input type="file" id="galleryImages" multiple> <div class="preview" id="galleryPreview"></div> <button type="button" class="save-btn" onclick="saveProduct()"> Save Product </button>
+    <input id="name" placeholder="Product Name"> <input id="price" type="number" placeholder="Price">
+ <input id="category" placeholder="Category"> <input id="sizes" placeholder="Sizes (S,M,L)"> <input id="colors" placeholder="Colors (Red,Blue)"> <label>Cover Image</label> <input type="file" id="coverImage"> <div class="preview" id="coverPreview"></div> <label>Gallery Images</label> <input type="file" id="galleryImages" multiple> <div class="preview" id="galleryPreview"></div> <button type="button" class="save-btn" onclick="saveProduct()"> Save Product </button>
   </div>
 </div>
 
@@ -184,10 +185,15 @@ async function saveProduct() {
       available: true
     };
 
-    if (!payload.name || !payload.price || !payload.category) {
-      alert("Fill required fields");
-      return;
-    }
+    if (
+  !payload.name ||
+  payload.category === "" ||
+  Number.isNaN(payload.price)
+) {
+  alert("Fill required fields");
+  return;
+}
+
 
     const { error } = await client
       .from("products")
@@ -210,5 +216,6 @@ async function saveProduct() {
 
 </body>
 </html>
+
 
 
