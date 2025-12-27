@@ -172,10 +172,14 @@ async function loadProducts(){
 
 async function saveProduct() {
   try {
+    const nameValue = (name.value || "").trim();
+    const categoryValue = (category.value || "").trim();
+    const priceValue = (price.value || "").trim();
+
     const payload = {
-      name: (name.value || "").trim(),
-      price: Number(price.value),
-      category: (category.value || "").trim(),
+      name: nameValue,
+      category: categoryValue,
+      price: priceValue === "" ? null : Number(priceValue),
       sizes: sizes.value
         ? sizes.value.split(",").map(s => s.trim()).filter(Boolean)
         : [],
@@ -185,21 +189,13 @@ async function saveProduct() {
       available: true
     };
 
-    if (
-  payload.name === "" ||
-  payload.category === "" ||
-  isNaN(payload.price) ||
-  payload.price <= 0
-) {
-  alert("Fill required fields");
-  return;
-}
+    // ✅ Proper validation
+    if (!payload.name || !payload.category || payload.price === null || payload.price <= 0) {
+      alert("Fill required fields");
+      return;
+    }
 
-
-    const { error } = await client
-      .from("products")
-      .insert(payload);
-
+    const { error } = await client.from("products").insert(payload);
     if (error) throw error;
 
     closeModal();
@@ -211,12 +207,14 @@ async function saveProduct() {
   }
 }
 
+
 </script>
 
   
 
 </body>
 </html>
+
 
 
 
