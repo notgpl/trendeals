@@ -40,6 +40,35 @@ body{ background:var(--bg); }
   justify-content: center;
   cursor: pointer;
 }
+.modal-box {
+  position: relative;
+  background: #fff;
+  width: 460px;
+  max-width: 92%;
+  max-height: 85vh;           /* 👈 LIMIT HEIGHT */
+  overflow-y: auto;           /* 👈 SCROLL INSIDE */
+  border-radius: 18px;
+  padding: 24px;
+}
+
+/* ❌ Close button */
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #eee;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  background: #ddd;
+}
+
 
 /* header */
 .header{height:60px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
@@ -108,6 +137,7 @@ body{ background:var(--bg); }
 
 <div class="modal" id="modal">
   <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
     <input id="name" placeholder="Product Name"> <input id="price" type="number" placeholder="Price">
  <input id="category" placeholder="Category"> <input id="sizes" placeholder="Sizes (S,M,L)"> <input id="colors" placeholder="Colors (Red,Blue)"> <label>Cover Image</label> <input type="file" id="coverImage"> <div class="preview" id="coverPreview"></div> <label>Gallery Images</label> <input type="file" id="galleryImages" multiple> <div class="preview" id="galleryPreview"></div> <button type="button" class="save-btn" onclick="saveProduct()"> Save Product </button>
   </div>
@@ -330,6 +360,7 @@ function editProduct(product) {
 
 </body>
 </html>
+
 
 
 
