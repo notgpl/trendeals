@@ -294,7 +294,7 @@ async function loadProducts(){
     <h4>${p.name}</h4>
     <p>₹${p.price}</p>
     <div class="actions">
-      <button onclick='editProduct(${JSON.stringify(p)})'>Edit</button>
+      <button onclick="editProduct('${p.id}')">Edit</button>
       <button onclick="deleteProduct('${p.id}')">Delete</button>
     </div>
   </div>
@@ -397,15 +397,10 @@ async function saveProduct() {
     let error;
 
 if (editId) {
-  ({ error } = await client
-    .from("products")
-    .update(payload)
-    .eq("id", editId));
+  await client.from("products").update(payload).eq("id", editId);
   editId = null;
 } else {
-  ({ error } = await client
-    .from("products")
-    .insert(payload));
+  await client.from("products").insert(payload);
 }
 
 if (error) throw error;
@@ -423,26 +418,43 @@ if (error) throw error;
 
 let editId = null;
 
-function editProduct(product) {
-  editId = product.id;
+async function editProduct(id) {
+  editId = id;
 
-  document.getElementById("name").value = product.name || "";
-  document.getElementById("price").value = product.price || "";
-  document.getElementById("category").value = product.category || "";
-  document.getElementById("sizes").value = (product.sizes || []).join(",");
-  document.getElementById("colors").value = (product.colors || []).join(",");
+  const { data, error } = await client
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .single();
 
-  // previews
-  document.getElementById("coverPreview").innerHTML = product.cover_image
-    ? `<img src="${product.cover_image}">`
+  if (error) {
+    alert("Failed to load product");
+    return;
+  }
+
+  document.getElementById("name").value = data.name || "";
+  document.getElementById("price").value = data.price || "";
+  document.getElementById("category").value = data.category || "";
+  document.getElementById("sizes").value = (data.sizes || []).join(",");
+  document.getElementById("colors").value = (data.colors || []).join(",");
+
+  // Cover preview
+  document.getElementById("coverPreview").innerHTML = data.cover_image
+    ? `<img src="${data.cover_image}">`
     : "";
 
-  document.getElementById("galleryPreview").innerHTML = (product.images || [])
+  // Gallery preview
+  document.getElementById("galleryPreview").innerHTML = (data.images || [])
     .map(img => `<img src="${img}">`)
     .join("");
 
   openModal();
 }
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+  modal.classList.remove("active");
+});
 
 
 
@@ -452,6 +464,7 @@ function editProduct(product) {
 
 </body>
 </html>
+
 
 
 
