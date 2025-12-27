@@ -280,6 +280,13 @@ async function saveProduct() {
   }
 }
 
+  if (editId) {
+  await client.from("products").update(payload).eq("id", editId);
+  editId = null;
+} else {
+  await client.from("products").insert(payload);
+}
+
 let editId = null;
 
 function editProduct(product) {
@@ -311,6 +318,7 @@ function editProduct(product) {
 
 </body>
 </html>
+
 
 
 
