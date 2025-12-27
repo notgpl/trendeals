@@ -183,17 +183,19 @@ async function saveProduct() {
     const priceValue = priceInput.value.trim();
 
     const payload = {
-      name: nameValue,
-      category: categoryValue,
-      price: priceValue === "" ? null : Number(priceValue),
-      sizes: sizesInput.value
-        ? sizesInput.value.split(",").map(s => s.trim()).filter(Boolean)
-        : [],
-      colors: colorsInput.value
-        ? colorsInput.value.split(",").map(c => c.trim()).filter(Boolean)
-        : [],
-      available: true
-    };
+  name: nameValue,
+  category: categoryValue,
+  price: Number(priceValue),
+  sizes: sizesInput.value
+    ? sizesInput.value.split(",").map(s => s.trim()).filter(Boolean)
+    : [],
+  colors: colorsInput.value
+    ? colorsInput.value.split(",").map(c => c.trim()).filter(Boolean)
+    : [],
+  images: [],        // ✅ THIS LINE FIXES EVERYTHING
+  available: true
+};
+
 
     // ✅ REAL validation
     if (!payload.name || !payload.category || payload.price === null || payload.price <= 0) {
@@ -221,6 +223,7 @@ async function saveProduct() {
 
 </body>
 </html>
+
 
 
 
