@@ -172,24 +172,30 @@ async function loadProducts(){
 
 async function saveProduct() {
   try {
-    const nameValue = (name.value || "").trim();
-    const categoryValue = (category.value || "").trim();
-    const priceValue = (price.value || "").trim();
+    const nameInput = document.getElementById("name");
+    const priceInput = document.getElementById("price");
+    const categoryInput = document.getElementById("category");
+    const sizesInput = document.getElementById("sizes");
+    const colorsInput = document.getElementById("colors");
+
+    const nameValue = nameInput.value.trim();
+    const categoryValue = categoryInput.value.trim();
+    const priceValue = priceInput.value.trim();
 
     const payload = {
       name: nameValue,
       category: categoryValue,
       price: priceValue === "" ? null : Number(priceValue),
-      sizes: sizes.value
-        ? sizes.value.split(",").map(s => s.trim()).filter(Boolean)
+      sizes: sizesInput.value
+        ? sizesInput.value.split(",").map(s => s.trim()).filter(Boolean)
         : [],
-      colors: colors.value
-        ? colors.value.split(",").map(c => c.trim()).filter(Boolean)
+      colors: colorsInput.value
+        ? colorsInput.value.split(",").map(c => c.trim()).filter(Boolean)
         : [],
       available: true
     };
 
-    // ✅ Proper validation
+    // ✅ REAL validation
     if (!payload.name || !payload.category || payload.price === null || payload.price <= 0) {
       alert("Fill required fields");
       return;
@@ -208,12 +214,14 @@ async function saveProduct() {
 }
 
 
+
 </script>
 
   
 
 </body>
 </html>
+
 
 
 
