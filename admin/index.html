@@ -13,6 +13,34 @@
 :root { --purple:#8e44ad; --bg:#faf6fb; }
 *{ box-sizing:border-box; font-family:Arial, sans-serif; margin:0; padding:0 }
 body{ background:var(--bg); }
+  .preview img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.preview div {
+  position: relative;
+}
+
+.preview span {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: red;
+  color: #fff;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
 /* header */
 .header{height:60px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
 .logo{font-size:22px;font-weight:800}
@@ -141,18 +169,46 @@ async function loadProducts(){
   });
 }
 
-async function saveProduct(){
-  await client.from("products").insert({
-    name:name.value.trim(),
-    price:Number(price.value),
-    category:category.value.trim(),
-    available:true
-  });
-  closeModal();
-  loadProducts();
+async function saveProduct() {
+  try {
+    const payload = {
+      name: (name.value || "").trim(),
+      price: Number(price.value),
+      category: (category.value || "").trim(),
+      sizes: sizes.value
+        ? sizes.value.split(",").map(s => s.trim()).filter(Boolean)
+        : [],
+      colors: colors.value
+        ? colors.value.split(",").map(c => c.trim()).filter(Boolean)
+        : [],
+      available: true
+    };
+
+    if (!payload.name || !payload.price || !payload.category) {
+      alert("Fill required fields");
+      return;
+    }
+
+    const { error } = await client
+      .from("products")
+      .insert(payload);
+
+    if (error) throw error;
+
+    closeModal();
+    loadProducts();
+
+  } catch (err) {
+    console.error("Save failed:", err);
+    alert("Failed to save product");
+  }
 }
+
 </script>
+
+  
 
 </body>
 </html>
+
 
