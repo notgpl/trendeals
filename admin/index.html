@@ -682,12 +682,45 @@ function resetProductForm() {
   // title
   document.getElementById("modalTitle").textContent = "Add Product";
 }
-  
+
+const coverImage = document.getElementById("coverImage");
+const coverPreview = document.getElementById("coverPreview");
+
+coverImage.addEventListener("change", () => {
+  const file = coverImage.files[0];
+  if (!file) return;
+
+  coverPreview.innerHTML = `
+    <div class="preview-item">
+      <img src="${URL.createObjectURL(file)}">
+      <span class="remove" onclick="clearCoverPreview()">×</span>
+    </div>
+  `;
+});
+
+function clearCoverPreview() {
+  coverImage.value = "";
+  coverPreview.innerHTML = "";
+}
+
+galleryImages.addEventListener("change", () => {
+  galleryPreview.innerHTML = "";
+
+  Array.from(galleryImages.files).forEach((file, index) => {
+    galleryPreview.innerHTML += `
+      <div class="preview-item">
+        <img src="${URL.createObjectURL(file)}">
+      </div>
+    `;
+  });
+});
+
 </script>
 
   
 </body>
 </html>
+
 
 
 
