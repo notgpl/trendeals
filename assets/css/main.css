@@ -1517,3 +1517,9 @@ contact-item h4 {
   }
 }
 
+@media (max-width: 768px) {
+  .category-topbar {
+    margin-bottom: 16px;
+  }
+}
+
