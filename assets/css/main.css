@@ -1505,3 +1505,8 @@ contact-item h4 {
   cursor: pointer;
 }
 
+@media (max-width: 768px) {
+  #categoryTitle {
+    display: none;
+  }
+}
