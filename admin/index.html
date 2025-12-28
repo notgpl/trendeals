@@ -177,6 +177,19 @@ body{ background:var(--bg); }
     opacity: 1;
   }
 }
+  
+.file-input {
+  display: none;
+}
+
+.file-btn {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #f3f3f3;
+  cursor: pointer;
+  font-size: 14px;
+}
 
 
 
@@ -256,8 +269,12 @@ body{ background:var(--bg); }
     <input id="colors" placeholder="Colors (Red,Blue)">
 
     <label>Cover Image</label>
-    <input type="file" id="coverImage">
-    <div class="preview" id="coverPreview"></div>
+
+<label class="file-btn" for="coverImage">Choose image</label>
+<input type="file" id="coverImage" class="file-input">
+
+<div class="preview" id="coverPreview"></div>
+
 
     <label>Gallery Images</label>
     <input type="file" id="galleryImages" multiple>
@@ -481,20 +498,19 @@ async function editProduct(id) {
   existingGalleryImages = data.images ? [...data.images] : [];
 
   // previews with ❌ remove
-  coverPreview.innerHTML = existingCoverImage
-    ? `<div>
-         <img src="${existingCoverImage}">
-         <span onclick="removeCover()">×</span>
-       </div>`
-    : "";
+  coverPreview.innerHTML = `
+  <div class="preview-item">
+    <img src="${existingCoverImage}">
+    <span class="remove" onclick="removeCoverImage()">×</span>
+  </div>
+`;
 
-  galleryPreview.innerHTML = existingGalleryImages
-    .map((img, i) => `
-      <div>
-        <img src="${img}">
-        <span onclick="removeGallery(${i})">×</span>
-      </div>
-    `).join("");
+ galleryPreview.innerHTML += `
+  <div class="preview-item">
+    <img src="${img}">
+    <span class="remove" onclick="removeGalleryImage(${index})">×</span>
+  </div>
+`;
 
   openModal();
 }
@@ -552,6 +568,7 @@ function removeGallery(index) {
 
 </body>
 </html>
+
 
 
 
