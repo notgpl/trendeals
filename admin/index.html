@@ -408,33 +408,31 @@ async function saveProduct() {
     }
 
     // ✅ IMAGE UPLOAD
-    let coverUrl = null;
-    let galleryUrls = [];
+    let coverUrl = existingCoverImage;
+let galleryUrls = [...existingGalleryImages];
 
-    if (coverImage.files.length > 0) {
-      coverUrl = await uploadToGitHub(coverImage.files[0]);
-    }
+// only upload if user selected new ones
+if (coverImage.files.length > 0) {
+  coverUrl = await uploadToGitHub(coverImage.files[0]);
+}
 
-    if (galleryImages.files.length > 0) {
-      for (const file of galleryImages.files) {
-        galleryUrls.push(await uploadToGitHub(file));
-      }
-    }
+if (galleryImages.files.length > 0) {
+  for (const file of galleryImages.files) {
+    galleryUrls.push(await uploadToGitHub(file));
+  }
+}
+
 
     const payload = {
-      name: nameValue,
-      price: Number(priceValue),
-      category: categoryValue,
-      sizes: sizesInput.value
-        ? sizesInput.value.split(",").map(s => s.trim())
-        : [],
-      colors: colorsInput.value
-        ? colorsInput.value.split(",").map(c => c.trim())
-        : [],
-      cover_image: coverUrl,
-      images: galleryUrls,   // ⚠️ REQUIRED (NOT NULL)
-      available: true
-    };
+  name: nameValue,
+  price: Number(priceValue),
+  category: categoryValue,
+  sizes: sizesInput.value ? sizesInput.value.split(",").map(s=>s.trim()) : [],
+  colors: colorsInput.value ? colorsInput.value.split(",").map(c=>c.trim()) : [],
+  cover_image: coverUrl,
+  images: galleryUrls,
+  available: true
+};
 
     let result;
 
@@ -471,20 +469,32 @@ async function editProduct(id) {
     return;
   }
 
-  // Inputs
-  document.getElementById("name").value = data.name || "";
-  document.getElementById("price").value = data.price || "";
-  document.getElementById("category").value = data.category || "";
-  document.getElementById("sizes").value = (data.sizes || []).join(",");
-  document.getElementById("colors").value = (data.colors || []).join(",");
+  // inputs
+  name.value = data.name || "";
+  price.value = data.price || "";
+  category.value = data.category || "";
+  sizes.value = (data.sizes || []).join(",");
+  colors.value = (data.colors || []).join(",");
 
-  // ✅ STORE EXISTING IMAGES (IMPORTANT)
+  // ✅ STORE EXISTING IMAGES
   existingCoverImage = data.cover_image || null;
-  existingGalleryImages = [...(data.images || [])];
+  existingGalleryImages = data.images ? [...data.images] : [];
 
-  // ✅ RENDER PREVIEWS WITH ❌
-  renderCoverPreview();
-  renderGalleryPreview();
+  // previews with ❌ remove
+  coverPreview.innerHTML = existingCoverImage
+    ? `<div>
+         <img src="${existingCoverImage}">
+         <span onclick="removeCover()">×</span>
+       </div>`
+    : "";
+
+  galleryPreview.innerHTML = existingGalleryImages
+    .map((img, i) => `
+      <div>
+        <img src="${img}">
+        <span onclick="removeGallery(${i})">×</span>
+      </div>
+    `).join("");
 
   openModal();
 }
@@ -506,11 +516,6 @@ function renderCoverPreview() {
   `;
 }
 
-function removeCoverImage() {
-  existingCoverImage = null;
-  coverPreview.innerHTML = "";
-}
-
 function renderGalleryPreview() {
   galleryPreview.innerHTML = "";
 
@@ -524,9 +529,20 @@ function renderGalleryPreview() {
   });
 }
 
-function removeGalleryImage(index) {
+function removeCover() {
+  existingCoverImage = null;
+  coverPreview.innerHTML = "";
+}
+
+function removeGallery(index) {
   existingGalleryImages.splice(index, 1);
-  renderGalleryPreview();
+  galleryPreview.innerHTML = existingGalleryImages
+    .map((img, i) => `
+      <div>
+        <img src="${img}">
+        <span onclick="removeGallery(${i})">×</span>
+      </div>
+    `).join("");
 }
 
 
@@ -536,6 +552,7 @@ function removeGalleryImage(index) {
 
 </body>
 </html>
+
 
 
 
