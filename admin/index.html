@@ -425,27 +425,29 @@ async function saveProduct() {
     }
 
     // ✅ IMAGE UPLOAD
-    let coverUrl = existingCoverImage;
+   let coverUrl = existingCoverImage;
 let galleryUrls = [...existingGalleryImages];
 
-// only upload if user selected new ones
+// if user selected new cover
 if (coverImage.files.length > 0) {
   coverUrl = await uploadToGitHub(coverImage.files[0]);
 }
 
+// if user selected new gallery images
 if (galleryImages.files.length > 0) {
+  galleryUrls = [];
   for (const file of galleryImages.files) {
     galleryUrls.push(await uploadToGitHub(file));
   }
 }
 
 
-    const payload = {
+  const payload = {
   name: nameValue,
   price: Number(priceValue),
   category: categoryValue,
-  sizes: sizesInput.value ? sizesInput.value.split(",").map(s=>s.trim()) : [],
-  colors: colorsInput.value ? colorsInput.value.split(",").map(c=>c.trim()) : [],
+  sizes: sizesInput.value ? sizesInput.value.split(",").map(s => s.trim()) : [],
+  colors: colorsInput.value ? colorsInput.value.split(",").map(c => c.trim()) : [],
   cover_image: coverUrl,
   images: galleryUrls,
   available: true
@@ -454,10 +456,10 @@ if (galleryImages.files.length > 0) {
     let result;
 
 if (editId) {
-  result = await client.from("products").update(payload).eq("id", editId);
+  await client.from("products").update(payload).eq("id", editId);
   editId = null;
 } else {
-  result = await client.from("products").insert(payload);
+  await client.from("products").insert(payload);
 }
 
 if (result.error) throw result.error;
@@ -493,27 +495,16 @@ async function editProduct(id) {
   sizes.value = (data.sizes || []).join(",");
   colors.value = (data.colors || []).join(",");
 
-  // ✅ STORE EXISTING IMAGES
+  // store existing images
   existingCoverImage = data.cover_image || null;
-  existingGalleryImages = data.images ? [...data.images] : [];
+  existingGalleryImages = [...(data.images || [])];
 
-  // previews with ❌ remove
-  coverPreview.innerHTML = `
-  <div class="preview-item">
-    <img src="${existingCoverImage}">
-    <span class="remove" onclick="removeCoverImage()">×</span>
-  </div>
-`;
-
- galleryPreview.innerHTML += `
-  <div class="preview-item">
-    <img src="${img}">
-    <span class="remove" onclick="removeGalleryImage(${index})">×</span>
-  </div>
-`;
+  renderCoverPreview();
+  renderGalleryPreview();
 
   openModal();
 }
+
 
   document.addEventListener("DOMContentLoaded", () => {
   modal.classList.remove("active");
@@ -527,22 +518,9 @@ function renderCoverPreview() {
   coverPreview.innerHTML = `
     <div class="preview-item">
       <img src="${existingCoverImage}">
-      <span class="remove" onclick="removeCoverImage()">×</span>
+      <span class="remove" onclick="removeCover()">×</span>
     </div>
   `;
-}
-
-function renderGalleryPreview() {
-  galleryPreview.innerHTML = "";
-
-  existingGalleryImages.forEach((img, index) => {
-    galleryPreview.innerHTML += `
-      <div class="preview-item">
-        <img src="${img}">
-        <span class="remove" onclick="removeGalleryImage(${index})">×</span>
-      </div>
-    `;
-  });
 }
 
 function removeCover() {
@@ -550,16 +528,25 @@ function removeCover() {
   coverPreview.innerHTML = "";
 }
 
+
+function renderGalleryPreview() {
+  galleryPreview.innerHTML = "";
+
+  existingGalleryImages.forEach((url, index) => {
+    galleryPreview.innerHTML += `
+      <div class="preview-item">
+        <img src="${url}">
+        <span class="remove" onclick="removeGallery(${index})">×</span>
+      </div>
+    `;
+  });
+}
+
 function removeGallery(index) {
   existingGalleryImages.splice(index, 1);
-  galleryPreview.innerHTML = existingGalleryImages
-    .map((img, i) => `
-      <div>
-        <img src="${img}">
-        <span onclick="removeGallery(${i})">×</span>
-      </div>
-    `).join("");
+  renderGalleryPreview();
 }
+
 
 
 </script>
@@ -568,6 +555,7 @@ function removeGallery(index) {
 
 </body>
 </html>
+
 
 
 
