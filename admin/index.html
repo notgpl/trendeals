@@ -460,16 +460,25 @@ if (galleryImages.files.length > 0) {
   available: true
 };
 
-    let result;
+let response;
 
 if (editId) {
-  await client.from("products").update(payload).eq("id", editId);
+  response = await client
+    .from("products")
+    .update(payload)
+    .eq("id", editId);
+
   editId = null;
 } else {
-  await client.from("products").insert(payload);
+  response = await client
+    .from("products")
+    .insert(payload);
 }
 
-if (result.error) throw result.error;
+if (response.error) {
+  throw response.error;
+}
+
 
 
     closeModal();
@@ -585,5 +594,6 @@ function resetProductForm() {
   
 </body>
 </html>
+
 
 
