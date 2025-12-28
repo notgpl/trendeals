@@ -298,9 +298,12 @@ async function loadProducts(){
     <h4>${p.name}</h4>
     <p>₹${p.price}</p>
     <div class="actions">
-      <button onclick="editProduct('${p.id}')">Edit</button>
-      <button onclick="deleteProduct('${p.id}')">Delete</button>
-    </div>
+  <button onclick="editProduct('${p.id}')">Edit</button>
+  <button onclick="deleteProduct('${p.id}')">Delete</button>
+  <button onclick="toggleAvailable('${p.id}', ${p.available})">
+    ${p.available ? "Disable" : "Enable"}
+  </button>
+</div>
   </div>
 `;
   });
@@ -468,6 +471,7 @@ async function editProduct(id) {
 
 </body>
 </html>
+
 
 
 
