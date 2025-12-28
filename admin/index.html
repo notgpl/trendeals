@@ -332,8 +332,15 @@ function toggleMenu(){
   overlay.classList.toggle("active");
 }
 
-function openModal(){ modal.classList.add("active"); }
-function closeModal(){ modal.classList.remove("active"); }
+function openModal() {
+  resetProductForm();   
+  modal.classList.add("active");
+}
+  
+function closeModal() {
+  modal.classList.remove("active");
+  resetProductForm(); // optional but recommended
+}
 
 async function loadProducts(){
   const { data } = await client
@@ -495,12 +502,15 @@ async function editProduct(id) {
   sizes.value = (data.sizes || []).join(",");
   colors.value = (data.colors || []).join(",");
 
-  // store existing images
   existingCoverImage = data.cover_image || null;
   existingGalleryImages = [...(data.images || [])];
 
   renderCoverPreview();
   renderGalleryPreview();
+
+  document.getElementById("modalTitle").textContent = "Edit Product";
+  modal.classList.add("active");
+}
 
   openModal();
 }
@@ -547,38 +557,35 @@ function removeGallery(index) {
   renderGalleryPreview();
 }
 
+function resetProductForm() {
+  editId = null;
 
+  // inputs
+  name.value = "";
+  price.value = "";
+  category.value = "";
+  sizes.value = "";
+  colors.value = "";
 
+  // images
+  existingCoverImage = null;
+  existingGalleryImages = [];
+
+  // previews
+  coverPreview.innerHTML = "";
+  galleryPreview.innerHTML = "";
+
+  // file inputs (important!)
+  coverImage.value = "";
+  galleryImages.value = "";
+
+  // title
+  document.getElementById("modalTitle").textContent = "Add Product";
+}
+  
 </script>
 
   
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
