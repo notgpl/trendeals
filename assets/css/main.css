@@ -1510,3 +1510,10 @@ contact-item h4 {
     display: none;
   }
 }
+
+@media (max-width: 768px) {
+  .products-grid {
+    margin-top: 24px;
+  }
+}
+
