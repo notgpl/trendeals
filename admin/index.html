@@ -129,10 +129,6 @@ body{ background:var(--bg); }
   border: 1px solid #ddd;
 }
 
-.preview-item {
-  position: relative;
-}
-
 .preview-item .remove {
   position: absolute;
   top: -6px;
@@ -148,7 +144,10 @@ body{ background:var(--bg); }
   justify-content: center;
   cursor: pointer;
 }
-
+  
+.preview-item .remove:hover {
+  background: #e60000;
+}
 
 /* SAVE BUTTON */
 .save-btn {
@@ -553,6 +552,7 @@ function removeGallery(index) {
 
 </body>
 </html>
+
 
 
 
