@@ -117,6 +117,38 @@ body{ background:var(--bg); }
   border: 1px solid #ddd;
 }
 
+  .preview-item {
+  position: relative;
+}
+
+.preview-item img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.preview-item .remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  background: #ff3b3b;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.preview-item .remove:hover {
+  background: #e60000;
+}
+
 /* SAVE BUTTON */
 .save-btn {
   margin-top: 15px;
@@ -243,6 +275,9 @@ body{ background:var(--bg); }
 <script>
 const client = window.supabaseClient;
 const modal = document.getElementById("modal");
+let editId = null;
+let existingCoverImage = null;
+let existingGalleryImages = [];
 
 document.addEventListener("DOMContentLoaded", checkAdminSession);
 
@@ -439,30 +474,63 @@ async function editProduct(id) {
     return;
   }
 
+  // Inputs
   document.getElementById("name").value = data.name || "";
   document.getElementById("price").value = data.price || "";
   document.getElementById("category").value = data.category || "";
   document.getElementById("sizes").value = (data.sizes || []).join(",");
   document.getElementById("colors").value = (data.colors || []).join(",");
 
-  // Cover preview
-  document.getElementById("coverPreview").innerHTML = data.cover_image
-    ? `<img src="${data.cover_image}">`
-    : "";
+  // ✅ STORE EXISTING IMAGES (IMPORTANT)
+  existingCoverImage = data.cover_image || null;
+  existingGalleryImages = [...(data.images || [])];
 
-  // Gallery preview
-  document.getElementById("galleryPreview").innerHTML = (data.images || [])
-    .map(img => `<img src="${img}">`)
-    .join("");
+  // ✅ RENDER PREVIEWS WITH ❌
+  renderCoverPreview();
+  renderGalleryPreview();
 
   openModal();
 }
-
 
   document.addEventListener("DOMContentLoaded", () => {
   modal.classList.remove("active");
 });
 
+function renderCoverPreview() {
+  coverPreview.innerHTML = "";
+
+  if (!existingCoverImage) return;
+
+  coverPreview.innerHTML = `
+    <div class="preview-item">
+      <img src="${existingCoverImage}">
+      <span class="remove" onclick="removeCoverImage()">×</span>
+    </div>
+  `;
+}
+
+function removeCoverImage() {
+  existingCoverImage = null;
+  coverPreview.innerHTML = "";
+}
+
+function renderGalleryPreview() {
+  galleryPreview.innerHTML = "";
+
+  existingGalleryImages.forEach((img, index) => {
+    galleryPreview.innerHTML += `
+      <div class="preview-item">
+        <img src="${img}">
+        <span class="remove" onclick="removeGalleryImage(${index})">×</span>
+      </div>
+    `;
+  });
+}
+
+function removeGalleryImage(index) {
+  existingGalleryImages.splice(index, 1);
+  renderGalleryPreview();
+}
 
 
 </script>
@@ -471,6 +539,7 @@ async function editProduct(id) {
 
 </body>
 </html>
+
 
 
 
