@@ -209,7 +209,8 @@ body{ background:var(--bg); }
   <div class="products" id="products"></div>
 </div>
 
-<div class="modal-box">
+<div class="modal" id="modal" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
   <div class="modal-header">
     <h3 id="modalTitle">Add Product</h3>
     <button class="modal-close" onclick="closeModal()">✕</button>
@@ -232,6 +233,8 @@ body{ background:var(--bg); }
 
     <button class="save-btn" onclick="saveProduct()">Save Product</button>
   </div>
+</div>
+</div>
 </div>
 
 
@@ -464,6 +467,7 @@ async function editProduct(id) {
 
 </body>
 </html>
+
 
 
 
