@@ -401,16 +401,16 @@ async function saveProduct() {
       available: true
     };
 
-    let error;
+    let result;
 
 if (editId) {
-  await client.from("products").update(payload).eq("id", editId);
+  result = await client.from("products").update(payload).eq("id", editId);
   editId = null;
 } else {
-  await client.from("products").insert(payload);
+  result = await client.from("products").insert(payload);
 }
 
-if (error) throw error;
+if (result.error) throw result.error;
 
 
     closeModal();
