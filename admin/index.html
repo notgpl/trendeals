@@ -535,11 +535,9 @@ if (coverImage.files.length > 0) {
 }
 
 // if user selected new gallery images
-if (galleryImages.files.length > 0) {
-  galleryUrls = [];
-  for (const file of galleryImages.files) {
-    galleryUrls.push(await uploadToGitHub(file));
-  }
+// upload newly selected gallery files
+for (const file of newGalleryFiles) {
+  galleryUrls.push(await uploadToGitHub(file));
 }
 
 
@@ -657,31 +655,29 @@ function removeGallery(index) {
   renderGalleryPreview();
 }
 
+
 function resetProductForm() {
   editId = null;
 
-  // inputs
   name.value = "";
   price.value = "";
   category.value = "";
   sizes.value = "";
   colors.value = "";
 
-  // images
   existingCoverImage = null;
   existingGalleryImages = [];
+  newGalleryFiles = [];
 
-  // previews
   coverPreview.innerHTML = "";
   galleryPreview.innerHTML = "";
 
-  // file inputs (important!)
   coverImage.value = "";
   galleryImages.value = "";
 
-  // title
   document.getElementById("modalTitle").textContent = "Add Product";
 }
+
 
 const coverImage = document.getElementById("coverImage");
 const coverPreview = document.getElementById("coverPreview");
@@ -703,23 +699,54 @@ function clearCoverPreview() {
   coverPreview.innerHTML = "";
 }
 
+let newGalleryFiles = [];
+
 galleryImages.addEventListener("change", () => {
+  newGalleryFiles = Array.from(galleryImages.files);
+  renderNewGalleryPreview();
+});
+
+function renderNewGalleryPreview() {
   galleryPreview.innerHTML = "";
 
-  Array.from(galleryImages.files).forEach((file, index) => {
+  // existing images (from DB)
+  existingGalleryImages.forEach((url, index) => {
     galleryPreview.innerHTML += `
       <div class="preview-item">
-        <img src="${URL.createObjectURL(file)}">
+        <img src="${url}">
+        <span class="remove" onclick="removeExistingGallery(${index})">×</span>
       </div>
     `;
   });
-});
+
+  // newly selected files
+  newGalleryFiles.forEach((file, index) => {
+    galleryPreview.innerHTML += `
+      <div class="preview-item">
+        <img src="${URL.createObjectURL(file)}">
+        <span class="remove" onclick="removeNewGallery(${index})">×</span>
+      </div>
+    `;
+  });
+}
+
+function removeExistingGallery(index) {
+  existingGalleryImages.splice(index, 1);
+  renderNewGalleryPreview();
+}
+
+function removeNewGallery(index) {
+  newGalleryFiles.splice(index, 1);
+  renderNewGalleryPreview();
+}
+
 
 </script>
 
   
 </body>
 </html>
+
 
 
 
